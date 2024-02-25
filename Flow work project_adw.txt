@@ -1,0 +1,14 @@
+การทำงานกับ library 
+	tailwind.css ใช้เพื่อตกแต่งได้
+	mui-material สำหรับ component
+	route-dom เพื่อ route ไปหน้าต่างๆ
+การสร้าง branch 
+	feat/ชื่อ feature(หรือชื่อการทำอะไรอย่าง)
+เมื่อทำงานเสร็จแล้วให้ push ขึ้นไปแล้ว create pull request แต่ว่าอย่าพึ่ง merge รอ review
+อย่าทำงานที่ branch main 
+
+struct folder 
+	pages เอาไว้สร้างหน้าต่างๆ
+		-folder หน้า  ข้างใน folder หน้าสามารถเลือกสร้า css หรือ component ของตัวเองได้
+	component เอาไว้สร้าง component ใหญ่ๆสำหรับใช้ได้หลายๆครั้ง
+	assets เก็บรูปและ icon ที่เราต้องการเก็บไว้
