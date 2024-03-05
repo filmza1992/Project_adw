@@ -22,7 +22,7 @@ const SignInPage = () => {
       email: emailRef.current?.value,
       password: password1Ref.current?.value,
       birth_day: birth_dayRef.current?.value,
-      img_url: passwordRef.current?.value,
+      // img_url: passwordRef.current?.value,
     };
     const url = `http://localhost:9000/user/login`;
     const response = await axios.post(url, body);
