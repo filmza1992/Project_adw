@@ -6,9 +6,9 @@ import Typography from "@mui/joy/Typography";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-function CardProfile() {
+function CardProfile(data) {
   const navigate = useNavigate();
-
+  console.log(data.data.username);
   function navigateToProfil() {
     navigate("/UpLoadProfile");
   }
@@ -28,11 +28,11 @@ function CardProfile() {
       }}
     >
       <AspectRatio ratio="1" sx={{ width: 90 }} >
-        <img src="src\assets\test.jpg" loading="lazy" alt=""/>
+        <img src={data.data.img_url} loading="lazy" alt=""/>
       </AspectRatio>
       <CardContent>
         <Typography level="title-lg" id="card-description">
-          Phirada Thaworn
+          {data.data.username}
         </Typography>
         <Typography level="body-sm" aria-describedby="card-description" mb={1}>
           {/* <Link
@@ -41,7 +41,7 @@ function CardProfile() {
             href="#interactive-card"
             sx={{ color: "text.tertiary" }}
           > */}
-          64011212035@msu.ac.th
+          {data.data.email}
           {/* </Link> */}
         </Typography>
         <Button

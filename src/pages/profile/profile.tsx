@@ -3,7 +3,8 @@ import TextField from "@mui/material/TextField";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { Button, Grid } from "@mui/material";
-import Header from "../../component/headerUser";
+import HeaderUser from "../../component/headerUser";
+import Header from "../../component/header";
 import CardProfile from "../../component/cardProfile";
 import AspectRatio from "@mui/joy/AspectRatio";
 import Avatar from "@mui/joy/Avatar";
@@ -11,14 +12,35 @@ import Card from "@mui/joy/Card";
 import IconButton from "@mui/joy/IconButton";
 import Typography from "@mui/joy/Typography";
 import Link from "@mui/joy/Link";
+import { useParams, useSearchParams } from "react-router-dom";
+import { Users } from "../../model/users";
+import axios from "axios";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
+import { useEffect, useState } from "react";
 const ProfilePage = () => {
   const arr = [1, 2, 3, 4, 5];
-  const Component = styled.div`
-    color: #d1d1d1;
-    background: rgba(100, 100, 100, 0.87);
-    margin: 1rem;
-  `;
+  const params = useParams();
+  const [data, setData] = useState<Users[]>([]);
+  useEffect(() => {
+    if (params.id != null) {
+      callApi(params.id);
+    }
+  }, [params.id]);
+  console.log(params.id);
+  async function callApi(id: string) {
+    
+    try {
+      const url = `http://localhost:9000/user/${id}`;
+      const response = await axios.get(url);
+      const users: User[] = response.data;
+      setData(users);
+      const user = users.data;
+      setData(user);
+      console.log();
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
   const navigate = useNavigate();
 //   function navigateTo() {
 //     navigate("/");
@@ -28,7 +50,7 @@ const ProfilePage = () => {
   }
   return (
     <>
-      <Header></Header>
+     {params.id != null ? <HeaderUser data={params.id} /> : <Header />}
       <Container sx={{}}>
         <Box sx={{}}>
           <Box sx={{}}>
@@ -50,7 +72,7 @@ const ProfilePage = () => {
                 marginBottom: "3rem",
               }}
             >
-              <CardProfile></CardProfile>
+              <CardProfile data={data} ></CardProfile>
             </Box>
           </Box>
           <div>
@@ -94,7 +116,7 @@ const ProfilePage = () => {
                         }}
                       >
                         <img
-                          src="https://images.unsplash.com/photo-1492305175278-3b3afaa2f31f?auto=format&fit=crop&w=2000"
+                          src="https://images.unsplash.com/photo-1492305175278-3b3afaa2f31f?auto=format&fit=crop&w=2262"
                           loading="lazy"
                           alt=""
                         />

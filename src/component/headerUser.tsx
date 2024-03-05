@@ -4,16 +4,21 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Avatar from "@mui/joy/Avatar";
 import { useNavigate } from "react-router-dom";
 
-function Header() {
+function Header(props) {
+  const img = null;
+  console.log("from headUser "+props.data);
+  function setImg(img: string) {
+    this.img = img;
+  }
   const navigate = useNavigate();
   function navigateToHome() {
-    navigate("/");
+    navigate("/"+props.data);
   }
   function navigateToRank() {
-    navigate("/rank");
+    navigate("/rank/"+props.data);
   }
   function navigateToProfile() {
-    navigate("/profile");
+    navigate("/profile/"+props.data);
   }
   function navigateToLogin() {
     navigate("/login");
@@ -26,7 +31,9 @@ function Header() {
       >
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            <div onClick={navigateToHome} style={{cursor : "pointer"}}>View</div>
+            <div onClick={navigateToHome} style={{ cursor: "pointer" }}>
+              View
+            </div>
           </Typography>
           <Typography
             variant="h6"
@@ -42,11 +49,12 @@ function Header() {
             </Button>
             <Button color="inherit" onClick={navigateToProfile}>
               Profile
-            </Button><Button color="inherit" onClick={navigateToLogin}>
+            </Button>
+            <Button color="inherit" onClick={navigateToLogin}>
               Logout
             </Button>
           </Typography>
-          <Avatar alt="Remy Sharp" onClick={navigateToProfile} sx={{cursor : "pointer"}} src="src\assets\test.jpg" />
+        
         </Toolbar>
       </AppBar>
     </Box>
