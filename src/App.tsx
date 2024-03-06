@@ -11,13 +11,23 @@ import './App.css'
 function App() {
 
 const routers = createBrowserRouter([
+  { path: "/", element: <HomePage /> },
   { path: "/:id", element: <HomePage /> },
+
   { path: "/login", element: <LoginPage /> },
+
+  { path: "/rank/:id", element: <RankPage /> },
   { path: "/rank", element: <RankPage /> },
+
   { path: "/profile/:id", element: <ProfilePage /> },
+
   { path: "/signIn", element: <SignInPage /> },
-  { path: "/UpLoadProfile:id", element: <UpLoadProfilePage /> },
-  { path: "/changeImg:id", element: <ChangeImgPage /> },
+
+  { path: "/UpLoadProfile/:id", element: <UpLoadProfilePage /> },
+
+
+  { path: "/changeImg/:id", element: <ChangeImgPage /> },
+
 ]);
   return (
     <>

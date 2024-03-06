@@ -1,17 +1,19 @@
-
 import AspectRatio from "@mui/joy/AspectRatio";
 import Card from "@mui/joy/Card";
 import CardContent from "@mui/joy/CardContent";
 import Typography from "@mui/joy/Typography";
 import { Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Users } from "../model/users";
 
 function CardProfile(data) {
+ 
+  function navigateToUpLoadProfile() {
+    navigate("/UpLoadProfile/"+data.data._id);
+  }
   const navigate = useNavigate();
   console.log(data.data.username);
-  function navigateToProfil() {
-    navigate("/UpLoadProfile");
-  }
   return (
     <Card
       variant="outlined"
@@ -27,8 +29,8 @@ function CardProfile(data) {
         },
       }}
     >
-      <AspectRatio ratio="1" sx={{ width: 90 }} >
-        <img src={data.data.img_url} loading="lazy" alt=""/>
+      <AspectRatio ratio="1" sx={{ width: 90 }}>
+        <img src={data.data.img_url} loading="lazy" alt="" />
       </AspectRatio>
       <CardContent>
         <Typography level="title-lg" id="card-description">
@@ -48,7 +50,7 @@ function CardProfile(data) {
           sx={{
             color: "rgba(100, 100, 100, 0.87)",
           }}
-          onClick={navigateToProfil}
+          onClick={navigateToUpLoadProfile}
         >
           Edit Profile
         </Button>

@@ -1,12 +1,13 @@
 import { Box, Container } from "@mui/system";
 import TextField from "@mui/material/TextField";
-import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import Header from "../../component/header";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import axios from "axios";
+import { Users } from "../../model/users";
 const SignInPage = () => {
+  const imageRef = useRef<HTMLInputElement>();
   const usernameRef = useRef<HTMLInputElement>();
   const phoneRef = useRef<HTMLInputElement>();
   const emailRef = useRef<HTMLInputElement>();
@@ -14,26 +15,47 @@ const SignInPage = () => {
   const password1Ref = useRef<HTMLInputElement>();
   const password2Ref = useRef<HTMLInputElement>();
   const navigate = useNavigate();
+  const [data, setData] = useState<Users[]>([]);
+  async function navigateToUploadProfile() {
+    if (password1Ref.current?.value == password2Ref.current?.value) {
+      const body = {
+        img_url: imageRef.current?.value,
+        username: usernameRef.current?.value,
+        phone: phoneRef.current?.value,
+        email: emailRef.current?.value,
+        password: password1Ref.current?.value,
+        birth_day: birth_dayRef.current?.value,
+        // img_url: passwordRef.current?.value,
+      };
+      const url = `http://localhost:9000/user`;
+      const response = await axios.post(url, body);
+      const result = response.data;
+      console.log(result.message);
+      if (result.message == "created user successfully") {
+        console.log("created user successfully");
+        const url =
+          "http://localhost:9000/userEmail/" + emailRef.current?.value;
+        console.log(url);
+        const response = await axios.get(url);
+        const users: Users[] = response.data;
+        const user = users.data;
+        setData(user);
+        console.log(user);
+        console.log(user._id);
 
-  async function navigateToHome() {
-    const body = {
-      username: usernameRef.current?.value,
-      phone: phoneRef.current?.value,
-      email: emailRef.current?.value,
-      password: password1Ref.current?.value,
-      birth_day: birth_dayRef.current?.value,
-      // img_url: passwordRef.current?.value,
-    };
-    const url = `http://localhost:9000/user/login`;
-    const response = await axios.post(url, body);
-    const result = response.data;
+        navigate("/profile/" + user._id);
+      } else {
+        console.log("Created user not successfully");
+      }
+    } else {
+      alert("รหัสผ่านไม่ตรงกันกรุณาป้อนรหัสผ่านใหม่");
+    }
 
-
-    navigate("/");
+    // navigate("/");
   }
-  function navigateToUploadProfile() {
-    navigate("/UploadProfile");
-  }
+  // function navigateToUploadProfile() {
+  //   navigate("/UploadProfile");
+  // }
   return (
     <>
       <Header></Header>
@@ -48,7 +70,7 @@ const SignInPage = () => {
         <Box
           sx={(theme) => ({
             border: "1px solid rgba(100, 100, 100, 0.87)",
-            marginTop : "1rem",
+            marginTop: "1rem",
             padding: "1.2rem",
             borderRadius: "1rem",
             paddingBottom: "1.5rem",
@@ -64,6 +86,7 @@ const SignInPage = () => {
           <h1>Sign in</h1>
           <br />
           <p>Please select your new account</p>
+
           <TextField
             sx={{
               margin: "1rem",
@@ -81,9 +104,9 @@ const SignInPage = () => {
               }
             }
             id="outlined-basic"
-            label="phone"
+            label="image"
             variant="outlined"
-            inputRef={phoneRef}
+            inputRef={imageRef}
           />
           <br />
           <TextField
@@ -97,9 +120,11 @@ const SignInPage = () => {
           />
           <br />
           <TextField
-            sx={{
-              // margin: "1rem",
-            }}
+            sx={
+              {
+                // margin: "1rem",
+              }
+            }
             id="outlined-basic"
             label="birthday"
             variant="outlined"
@@ -107,11 +132,9 @@ const SignInPage = () => {
           />
           <br />
           <TextField
-            sx={
-              {
-                margin: "1rem",
-              }
-            }
+            sx={{
+              margin: "1rem",
+            }}
             id="outlined-basic"
             label="Email"
             variant="outlined"
@@ -120,9 +143,11 @@ const SignInPage = () => {
           <br />
           <TextField
             id="outlined-basic"
-            sx={{
-              // margin: "1rem",
-            }}
+            sx={
+              {
+                // margin: "1rem",
+              }
+            }
             label="Password"
             variant="outlined"
             type="password"
@@ -143,7 +168,8 @@ const SignInPage = () => {
           <br />
 
           <Button
-            sx={{ color: "rgba(100, 100, 100, 0.87)", width : "215px"}}
+            sx={{ color: "rgba(100, 100, 100, 0.87)", width: "215px" }}
+            type="submit"
             onClick={navigateToUploadProfile}
           >
             Confirm
