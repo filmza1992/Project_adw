@@ -22,7 +22,7 @@ const LoginPage = () => {
 
     if (result.message == "Successfuly_Login") {
       console.log("Successfuly_Login");
-      const url = "http://localhost:9000/userEmail/"+emailRef.current?.value;
+      const url = "http://localhost:9000/user/email/"+emailRef.current?.value;
       const response = await axios.get(url);
       const users: Users[] = response.data;
       const user = users.data;
