@@ -7,7 +7,7 @@ import Header from "../../component/header";
 import axios from "axios";
 import { Users } from "../../model/users";
 import { useRef, useState } from "react";
-const LoginPage = () => {
+const LoginUserPage = () => {
   const emailRef = useRef<HTMLInputElement>();
   const passwordRef = useRef<HTMLInputElement>();
   const [data, setData] = useState<Users[]>([]);
@@ -22,15 +22,16 @@ const LoginPage = () => {
 
     if (result.message == "Successfuly_Login") {
       console.log("Successfuly_Login");
-      const url = "http://localhost:9000/userEmail/"+emailRef.current?.value;
+      const url = "http://localhost:9000/user/email/"+emailRef.current?.value;
       const response = await axios.get(url);
       const users: Users[] = response.data;
       const user = users.data;
       setData(user);
       console.log(user._id);
-      navigate("/" + user._id);
+      navigate("/" + user._id + "?type=0");
     } else {
       console.log("Not successfully_Login");
+      alert("Login Not successfully\n======== :) ========\nPleass check your password")
     }
   }
   const navigate = useNavigate();
@@ -109,4 +110,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default LoginUserPage;

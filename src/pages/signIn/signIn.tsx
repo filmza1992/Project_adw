@@ -34,7 +34,7 @@ const SignInPage = () => {
       if (result.message == "created user successfully") {
         console.log("created user successfully");
         const url =
-          "http://localhost:9000/userEmail/" + emailRef.current?.value;
+          "http://localhost:9000/user/email/" + emailRef.current?.value;
         console.log(url);
         const response = await axios.get(url);
         const users: Users[] = response.data;

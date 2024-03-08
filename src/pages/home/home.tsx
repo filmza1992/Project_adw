@@ -1,19 +1,19 @@
 import { Box, Container } from "@mui/system";
 import HeaderUser from "../../component/headerUser";
 import Header from "../../component/header";
-import ListImage from "../../component/cardProfile";
+import HeaderAdmin from "../../component/headerAdmin";
 import { AppBar, Toolbar, IconButton, Typography, Button } from "@mui/material";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Users } from "../../model/users";
 import axios from "axios";
-import styled from "styled-components";
-import { useState,useEffect  } from "react";
+import { useState, useEffect } from "react";
 function HomePage() {
   const params = useParams();
   const [data, setData] = useState<Users[]>([]);
-  
+
   const [searchParams] = useSearchParams();
-  const id = searchParams.get("id");
+  const type = searchParams.get("type");
+  
   useEffect(() => {
     if (params.id != null) {
       callApi(params.id);
@@ -34,7 +34,14 @@ function HomePage() {
   //
   return (
     <>
-      {params.id != null ? <HeaderUser data={params.id} /> : <Header />}
+      {params.id != null && type === "0" ? (
+        <HeaderUser data={params.id} type={type} />
+      ) : params.id != null && type === "1" ? (
+        <HeaderAdmin data={params.id} type={type} />
+      ) : (
+        <Header />
+      )}
+
       {/* <Head></Head> */}
       <Container
         sx={{ marginTop: "2rem", placeItems: "center", minWidth: "320px" }}

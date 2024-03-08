@@ -1,20 +1,26 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import LoginPage from './pages/login/login'
+
 import HomePage from './pages/home/home'
 import RankPage from './pages/rank/rank'
 import ProfilePage from './pages/profile/profile'
 import SignInPage from './pages/signIn/signIn'
-import UpLoadProfilePage from './pages/profile/UpLoadProfile'
+import EditProfilePage from './pages/profile/EditProfile'
 import ChangeImgPage from './pages/changeImg/changeImg'
 import './App.css'
-
+import LoginAdminPage from './pages/login/loginAdmin'
+import ChooseLoginPage from './pages/login/ChooseLogin'
+import LoginUserPage from './pages/login/loginuser'
+import AdminPage from './pages/admin/admin'
+import ImageUpLoadPage from './pages/image/imageUpload'
 function App() {
 
 const routers = createBrowserRouter([
   { path: "/", element: <HomePage /> },
   { path: "/:id", element: <HomePage /> },
 
-  { path: "/login", element: <LoginPage /> },
+  { path: "/login", element: <ChooseLoginPage /> },
+  { path: "/loginAdmin", element: <LoginAdminPage /> },
+  { path: "/loginUser", element: <LoginUserPage /> },
 
   { path: "/rank/:id", element: <RankPage /> },
   { path: "/rank", element: <RankPage /> },
@@ -23,8 +29,11 @@ const routers = createBrowserRouter([
 
   { path: "/signIn", element: <SignInPage /> },
 
-  { path: "/UpLoadProfile/:id", element: <UpLoadProfilePage /> },
+  { path: "/UpLoadProfile/:id", element: <EditProfilePage /> },
 
+  { path: "/admin/:id", element: <AdminPage /> },
+
+  { path: "/imageUpLoad/:id", element: <ImageUpLoadPage /> },
 
   { path: "/changeImg/:id", element: <ChangeImgPage /> },
 

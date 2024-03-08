@@ -6,10 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 function Header({ data, type }) {
   const img = null;
-  console.log("from headUser ");
-  console.log(data);
-  console.log("from type headUser ");
-  console.log(type);
+  console.log("from headAdmin "+data);
   function setImg(img: string) {
     this.img = img;
   }
@@ -22,6 +19,9 @@ function Header({ data, type }) {
   }
   function navigateToProfile() {
     navigate("/profile/"+data+"/?type="+type);
+  }
+  function navigateToAdmin() {
+    navigate("/admin/"+data+"/?type="+type);
   }
   function navigateToLogin() {
     navigate("/login");
@@ -44,6 +44,9 @@ function Header({ data, type }) {
             sx={{ flexGrow: 1 }}
           ></Typography>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Button color="inherit" onClick={navigateToAdmin}>
+              Admin mode
+            </Button>
             <Button color="inherit" onClick={navigateToHome}>
               Home
             </Button>

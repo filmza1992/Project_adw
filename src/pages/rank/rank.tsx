@@ -1,7 +1,7 @@
 import { Box, Container } from "@mui/system";
 import TextField from "@mui/material/TextField";
 import styled from "styled-components";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Button } from "@mui/material";
 import Avatar from "@mui/joy/Avatar";
 import Table from "@mui/joy/Table";
@@ -9,25 +9,25 @@ import Typography from "@mui/joy/Typography";
 import Link from "@mui/joy/Link";
 import Header from "../../component/header";
 import HeaderUser from "../../component/headerUser";
+import HeaderAdmin from "../../component/headerAdmin";
 
 const RankPage = () => {
   const arr = [1, 2, 3, 4, 5];
   const navigate = useNavigate();
   const params = useParams();
-  
-  // useEffect(() => {
-  //   if (params.id != null) {
-  //     callApi(params.id);
-  //   }
-  // }, [params.id]);
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get("type");
 
   console.log(params.id);
-  function navigateTo() {
-    navigate("/");
-  }
   return (
     <>
-      {params.id != null ? <HeaderUser data={params.id} /> : <Header />}
+      {params.id != null && type === "0" ? (
+        <HeaderUser data={params.id} type={type} />
+      ) : params.id != null && type === "1" ? (
+        <HeaderAdmin data={params.id} type={type} />
+      ) : (
+        <Header />
+      )}
       <Container sx={{ marginTop: "1.5rem" }}>
         <Box sx={{}}>
           <Table
