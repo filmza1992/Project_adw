@@ -21,7 +21,7 @@ const RankPage = () => {
   console.log(params.id);
   return (
     <>
-      {params.id != null && type === "0" ? (
+     {params.id != null && type === "0" ? (
         <HeaderUser data={params.id} type={type} />
       ) : params.id != null && type === "1" ? (
         <HeaderAdmin data={params.id} type={type} />

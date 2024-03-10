@@ -17,6 +17,7 @@ import axios from "axios";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import { useEffect, useState } from "react";
 import { Admin } from "../../model/Admin";
+import { Image } from "../../model/Image";
 import { User } from "firebase/auth";
 
 const ProfilePage = () => {
@@ -26,6 +27,7 @@ const ProfilePage = () => {
   const type = searchParams.get("type");
   const [adminData, setAdminData] = useState<Admin[]>([]);
   const [userData, setUserData] = useState<User[]>([]);
+  const [ImageData, setImageData] = useState<Image[]>([]);
   const [data, setData] = useState<any>(null);
   const navigate = useNavigate(); // ย้ายไปข้างบน
 
@@ -51,10 +53,19 @@ const ProfilePage = () => {
       const url = `http://localhost:9000/user/${id}`;
       try {
         const response = await axios.get(url);
-        const users: Users[] = response.data;
-        const data = users.data;
+        const imagepost: image[] = response.data;
+        const data = imagepost.data;
         setUserData(data);
         setData(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+      const url1 = `http://localhost:9000/image/user/${id}`;
+      try {
+        const response = await axios.get(url1);
+        const users: Users[] = response.data;
+        const data = users.data;
+        setImageData(data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -62,11 +73,22 @@ const ProfilePage = () => {
   }
 
   function navigateToUpLoadProfile() {
-    navigate("/UpLoadProfile/" + data?._id + "/?type=" + type); // ใส่เช็คว่า data ไม่ใช่ null ก่อนที่จะเรียกใช้
+    navigate(
+      "/UpLoadProfile/" +
+        data?._id +
+        "/?type=" +
+        type +
+        "&name=" +
+        data.username +
+        "&phone=" +
+        data.phone +
+        "&birthday=" +
+        data.birth_day
+    ); // ใส่เช็คว่า data ไม่ใช่ null ก่อนที่จะเรียกใช้
   }
 
   function navigateToEditImage() {
-    navigate("/changeImg");
+    navigate("/changeImg/" + data?._id + "/?type=" + type);
   }
   function navigateToImgUploade() {
     navigate("/ImageUpLoad/" + data?._id + "/?type=" + type);
@@ -159,7 +181,7 @@ const ProfilePage = () => {
               columns={{ xs: 4, sm: 8, md: 12 }}
               sx={{ flexGrow: 1 }}
             >
-              {arr.map(() => {
+              {ImageData.map((item, index)  => {
                 return (
                   <Box sx={{ minHeight: 350, margin: "1rem" }}>
                     <Card
@@ -183,21 +205,6 @@ const ProfilePage = () => {
                         },
                       })}
                     >
-                      <AspectRatio
-                        variant="soft"
-                        sx={{
-                          flexGrow: 1,
-                          display: "contents",
-                          "--AspectRatio-paddingBottom":
-                            "clamp(0px, (100% - 360px) * 999, min(calc(100% / (16 / 9)), 300px))",
-                        }}
-                      >
-                        <img
-                          src="https://images.unsplash.com/photo-1492305175278-3b3afaa2f31f?auto=format&fit=crop&w=2262"
-                          loading="lazy"
-                          alt=""
-                        />
-                      </AspectRatio>
                       <Box
                         sx={{
                           display: "flex",
@@ -207,7 +214,7 @@ const ProfilePage = () => {
                         }}
                       >
                         <Box sx={{ display: "flex" }}>
-                          <div style={{textAlign : "left"}}>
+                          <div style={{ textAlign: "left" }}>
                             <Typography level="title-lg">
                               {data?.username}
                             </Typography>
@@ -234,7 +241,7 @@ const ProfilePage = () => {
                         >
                           <img
                             alt=""
-                            src="https://images.unsplash.com/photo-1492305175278-3b3afaa2f31f?auto=format&fit=crop&w=2262"
+                            src={ImageData[index].img_url}
                           />
                         </AspectRatio>
                         <Box sx={{ display: "flex", gap: 1.5, mt: "auto" }}>
@@ -246,7 +253,7 @@ const ProfilePage = () => {
                           <div>
                             <Typography level="body-xs">Designed by</Typography>
                             <Typography level="body-sm">
-                              Nature itself
+                              {data.username}
                             </Typography>
                           </div>
                         </Box>

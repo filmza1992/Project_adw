@@ -1,7 +1,7 @@
 import { Box, Container } from "@mui/system";
 import TextField from "@mui/material/TextField";
 import styled from "styled-components";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import Header from "../../component/headerUser";
 import CardProfile from "../../component/cardProfile";
@@ -17,8 +17,13 @@ import { Users } from "../../model/users";
 import axios from "axios";
 import { Button } from "@mui/material";
 import HeaderUser from "../../component/headerUser";
+import { getDownloadURL, listAll, ref, uploadBytes } from "firebase/storage";
+import { v4 } from "uuid";
+import { imgDB } from "../image/config";
+import HeaderAdmin from "../../component/headerAdmin";
 // import { initializeApp } from "firebase/app";
 // import { getStorage } from "firebase/storage";
+
 const EditProfilePage = () => {
   const imageRef = useRef<HTMLInputElement>();
   const usernameRef = useRef<HTMLInputElement>();
@@ -26,55 +31,65 @@ const EditProfilePage = () => {
   const emailRef = useRef<HTMLInputElement>();
   const birth_dayRef = useRef<HTMLInputElement>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const type = searchParams.get("type");
+  const name = searchParams.get("name");
+  const birth_day = searchParams.get("birthday");
+  const phone = searchParams.get("phone");
   const [data, setData] = useState<Users[]>([]);
   const params = useParams();
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  // const firebaseConfig = {
-  //   apiKey: "AIzaSyAQDzrW2mWlZ4JYjBqI-cmmcuKSQEx-Z2w",
-  //   authDomain: "project-adw.firebaseapp.com",
-  //   databaseURL: "https://project-adw-default-rtdb.firebaseio.com",
-  //   projectId: "project-adw",
-  //   storageBucket: "project-adw.appspot.com",
-  //   messagingSenderId: "432161617519",
-  //   appId: "1:432161617519:web:676549153358a72675bf9a",
-  //   measurementId: "G-NYNKTVFQWC",
-  // };
-  // // Initialize Firebase
-  // const app = initializeApp(firebaseConfig);
-  // const storage = getStorage(app); // แก้เป็นการใช้ getStorage
+  const [img, setImg] = useState();
+  const [imgUrl, setImgUrl] = useState([]);
+  const [imgUrlTmp, setImgUrlTmp] = useState();
+  useEffect(() => {
+    console.log(88);
+    listAll(ref(imgDB, "files")).then((imgs) => {
+      const promises = imgs.items.map((item) => getDownloadURL(item));
+      Promise.all(promises).then((urls) => {
+        setImgUrl(urls);
+        console.log("All images are loaded"); // ตรวจสอบว่ารูปภาพทั้งหมดถูกโหลดเสร็จแล้ว
+      });
+    });
+  }, []);
 
-  // const [file, setFile] = useState<File | null>(null);
-  // console.log(storage);
-  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (e.target.files && e.target.files[0]) {
-  //     setFile(e.target.files[0]);
-  //   }
-  // };
+  useEffect(() => {
+    console.log(88);
+    listAll(ref(imgDB, "files")).then((imgs) => {
+      imgs.items.forEach((val) => {
+        console.log(val.name);
+        getDownloadURL(val).then((url) => {
+          setImgUrl((data) => [...data, url]);
+        });
+      });
+    });
+  }, []);
 
-  // const handleUpload = () => {
-  //   if (file) {
-  //     const storageRef = storage.ref(); // ใช้ storage.ref() เพื่อสร้าง reference สำหรับ Firebase Storage
-  //     const fileRef = storageRef.child(file.name); // ใช้ storageRef.child() เพื่อสร้าง reference สำหรับไฟล์ที่ต้องการจัดเก็บ
-  //     fileRef
-  //       .put(file)
-  //       .then((snapshot) => {
-  //         console.log("File uploaded successfully");
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error uploading file:", error);
-  //       });
-  //   } else {
-  //     console.error("No file selected");
-  //   }
-  // };
+  useEffect(() => {
+    console.log(88);
+    listAll(ref(imgDB, "files")).then((imgs) => {
+      const promises = imgs.items.map((item) => getDownloadURL(item));
+      Promise.all(promises).then((urls) => {
+        setImgUrl(urls);
+        console.log("All images are loaded");
 
+        // ตรวจสอบว่ามีรูปที่อัปโหลดเสร็จแล้วหรือไม่
+        if (imgUrlTmp) {
+          console.log("index ==== : " + imgUrlTmp);
+          upUser(imgUrlTmp);
+          // ทำงานเมื่อมีรูปที่อัปโหลดเสร็จแล้ว
+          // สามารถเรียกใช้โค้ดที่ต้องการทำงานต่อไปได้ที่นี่
+        }
+        
+      });
+    });
+  }, [imgUrlTmp]);
   useEffect(() => {
     if (params.id != null) {
       callApi(params.id);
     }
   }, [params.id]);
   console.log(params.id);
-
+  console.log(data);
   async function callApi(id: string) {
     try {
       const url = `http://localhost:9000/user/${id}`;
@@ -89,20 +104,43 @@ const EditProfilePage = () => {
     }
   }
   async function navigateToUploadProfile() {
+    console.log("url : ");
+    if (imgUrl.length === 0) {
+      alert("รอสักครู่ให้รูปถูกโหลดให้เสร็จสมบูรณ์");
+      return;
+    }
+    if (img != null) {
+      const imgRef = ref(imgDB, `files/${v4()}`);
+      await uploadBytes(imgRef, img).then((val) => {
+        getDownloadURL(val.ref).then((url) => {
+          setImgUrlTmp(url);
+          console.log("url : " + url);
+        });
+      });
+    }
+    else{
+      upUser(data.img_url);
+    }
+  }
+
+  // navigate("/");
+
+  async function upUser(myurl: string) {
     const body = {
-      img_url: imageRef.current?.value,
+      img_url: myurl,
       username: usernameRef.current?.value,
       phone: phoneRef.current?.value,
       birth_day: birth_dayRef.current?.value,
-      // img_url: passwordRef.current?.value,
     };
-    const url = `http://localhost:9000/user`;
-    const response = await axios.post(url, body);
+    const url = `http://localhost:9000/user/${params.id}`;
+    const response = await axios.put(url, body);
     const result = response.data;
+    console.log("=== result.message ===");
     console.log(result.message);
-    if (result.message == "created user successfully") {
-      console.log("created user successfully");
-      const url = "http://localhost:9000/userEmail/" + emailRef.current?.value;
+
+    if (result.message == "Successful operation") {
+      console.log("Successful operation");
+      const url = `http://localhost:9000/user/${params.id}`;
       console.log(url);
       const response = await axios.get(url);
       const users: Users[] = response.data;
@@ -110,17 +148,20 @@ const EditProfilePage = () => {
       setData(user);
       console.log(user);
       console.log(user._id);
-      navigate("/profile/" + user._id);
+      navigate("/profile/" + user._id + "/?type=" + type);
     } else {
       alert("รหัสผ่านไม่ตรงกันกรุณาป้อนรหัสผ่านใหม่");
     }
-
-    // navigate("/");
   }
-
   return (
     <>
-      {params.id != null ? <HeaderUser data={params.id} /> : <Header />}
+      {params.id != null && type === "0" ? (
+        <HeaderUser data={params.id} type={type} />
+      ) : params.id != null && type === "1" ? (
+        <HeaderAdmin data={params.id} type={type} />
+      ) : (
+        <Header />
+      )}
 
       <Container sx={{ display: "flex", justifyContent: "center" }}>
         <Box
@@ -149,44 +190,23 @@ const EditProfilePage = () => {
             }}
             id="outlined-basic"
             // label="username"
-            value={data.username}
-            variant="outlined"
+            defaultValue={name}
             inputRef={usernameRef}
           />
           <br />
           <form>
-            <TextField type="file" />
-            <Button
-              style={{ marginLeft: "1rem", marginTop: "0.5rem" }}
-              variant="contained"
-              color="primary"
-              component="span"
-              // onClick={handleUpload}
-            >
-              Upload
-            </Button>
+            <TextField
+              type="file"
+              onChange={(e) => setImg(e.target.files[0])}
+            />
           </form>
-          <br />
-          <TextField
-            sx={
-              {
-                // margin: "1rem",
-              }
-            }
-            id="outlined-basic"
-            // label="image"
-            value={data.img_url}
-            variant="outlined"
-            inputRef={imageRef}
-          />
-          <br />
           <TextField
             sx={{
               margin: "1rem",
             }}
             id="outlined-basic"
             // label="phone"
-            value={data.phone}
+            defaultValue={phone}
             variant="outlined"
             inputRef={phoneRef}
           />
@@ -199,7 +219,7 @@ const EditProfilePage = () => {
             }
             id="outlined-basic"
             // label="birthday"
-            value={data.birth_day}
+            defaultValue={birth_day}
             variant="outlined"
             inputRef={birth_dayRef}
           />

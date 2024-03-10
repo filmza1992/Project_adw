@@ -6,7 +6,68 @@ import Header from "../../component/header";
 import { useRef, useState } from "react";
 import axios from "axios";
 import { Users } from "../../model/users";
+import { getDownloadURL, listAll, ref, uploadBytes } from "firebase/storage";
+import { useEffect } from "react";
+import { v4 } from "uuid";
+import { imgDB } from "../image/config";
 const SignInPage = () => {
+  const [img, setImg] = useState();
+  const [imgUrl, setImgUrl] = useState([]);
+  const [imgUrlTmp, setImgUrlTmp] = useState();
+  // function handleClick() {
+  //   if (img != null) {
+  //     const imgRef = ref(imgDB, `files/${v4()}`);
+  //     uploadBytes(imgRef, img).then((val) => {
+  //       getDownloadURL(val.ref).then((url) => {
+  //         setImgUrlTmp(url);
+  //         console.log("url : " + url);
+  //       });
+  //     });
+  //   }
+  // }
+  useEffect(() => {
+    console.log(88);
+    listAll(ref(imgDB, "files")).then((imgs) => {
+      const promises = imgs.items.map((item) => getDownloadURL(item));
+      Promise.all(promises).then((urls) => {
+        setImgUrl(urls);
+        console.log("All images are loaded"); // ตรวจสอบว่ารูปภาพทั้งหมดถูกโหลดเสร็จแล้ว
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    console.log(88);
+    listAll(ref(imgDB, "files")).then((imgs) => {
+      imgs.items.forEach((val) => {
+        console.log(val.name);
+        getDownloadURL(val).then((url) => {
+          setImgUrl((data) => [...data, url]);
+        });
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    console.log(88);
+    listAll(ref(imgDB, "files")).then((imgs) => {
+      const promises = imgs.items.map((item) => getDownloadURL(item));
+      Promise.all(promises).then((urls) => {
+        setImgUrl(urls);
+        console.log("All images are loaded");
+  
+        // ตรวจสอบว่ามีรูปที่อัปโหลดเสร็จแล้วหรือไม่
+        if (imgUrlTmp) {
+          console.log("index ==== : " + imgUrlTmp);
+          upUser();
+          // ทำงานเมื่อมีรูปที่อัปโหลดเสร็จแล้ว
+          // สามารถเรียกใช้โค้ดที่ต้องการทำงานต่อไปได้ที่นี่
+        }
+      });
+    });
+  }, [imgUrlTmp]);
+
+  console.log("url imgUrlTmp  +++++++++ : " + imgUrlTmp);
   const imageRef = useRef<HTMLInputElement>();
   const usernameRef = useRef<HTMLInputElement>();
   const phoneRef = useRef<HTMLInputElement>();
@@ -16,46 +77,56 @@ const SignInPage = () => {
   const password2Ref = useRef<HTMLInputElement>();
   const navigate = useNavigate();
   const [data, setData] = useState<Users[]>([]);
-  async function navigateToUploadProfile() {
-    if (password1Ref.current?.value == password2Ref.current?.value) {
-      const body = {
-        img_url: imageRef.current?.value,
-        username: usernameRef.current?.value,
-        phone: phoneRef.current?.value,
-        email: emailRef.current?.value,
-        password: password1Ref.current?.value,
-        birth_day: birth_dayRef.current?.value,
-        // img_url: passwordRef.current?.value,
-      };
-      const url = `http://localhost:9000/user`;
-      const response = await axios.post(url, body);
-      const result = response.data;
-      console.log(result.message);
-      if (result.message == "created user successfully") {
-        console.log("created user successfully");
-        const url =
-          "http://localhost:9000/user/email/" + emailRef.current?.value;
-        console.log(url);
-        const response = await axios.get(url);
-        const users: Users[] = response.data;
-        const user = users.data;
-        setData(user);
-        console.log(user);
-        console.log(user._id);
 
-        navigate("/profile/" + user._id);
-      } else {
-        console.log("Created user not successfully");
+
+  async function navigateToUploadProfile() {
+    if (imgUrl.length === 0) {
+      alert("รอสักครู่ให้รูปถูกโหลดให้เสร็จสมบูรณ์");
+      return;
+    }
+    if (password1Ref.current?.value == password2Ref.current?.value) {
+      if (img != null) {
+        const imgRef = ref(imgDB, `files/${v4()}`);
+        await uploadBytes(imgRef, img).then((val) => {
+          getDownloadURL(val.ref).then((url) => {
+            setImgUrlTmp(url);
+            console.log("url : " + url);
+          });
+        });
       }
     } else {
       alert("รหัสผ่านไม่ตรงกันกรุณาป้อนรหัสผ่านใหม่");
     }
-
-    // navigate("/");
   }
-  // function navigateToUploadProfile() {
-  //   navigate("/UploadProfile");
-  // }
+  async function upUser() {
+    const body = {
+      img_url: imgUrlTmp,
+      username: usernameRef.current?.value,
+      phone: phoneRef.current?.value,
+      email: emailRef.current?.value,
+      password: password1Ref.current?.value,
+      birth_day: birth_dayRef.current?.value,
+    };
+    const url = `http://localhost:9000/user`;
+    const response = await axios.post(url, body);
+    const result = response.data;
+    console.log(result.message);
+    if (result.message == "created user successfully") {
+      console.log("created user successfully");
+      const url =
+        "http://localhost:9000/user/email/" + emailRef.current?.value;
+      console.log(url);
+      const response = await axios.get(url);
+      const users: Users[] = response.data;
+      const user = users.data;
+      setData(user);
+      console.log(user);
+      console.log(user._id);
+      navigate("/profile/" + user._id + "/?type=0");
+    } else {
+      console.log("Created user not successfully");
+    }
+  }
   return (
     <>
       <Header></Header>
@@ -75,7 +146,7 @@ const SignInPage = () => {
             borderRadius: "1rem",
             paddingBottom: "1.5rem",
             transitionDuration: "0.7s",
-            width: "400px",
+            width: "600px",
             "&:hover": {
               boxShadow:
                 " 0 0 1em rgba(100, 100, 100, 0.87), 0 0 1em rgba(100, 100, 100, 0.87),  0 0 1em rgba(100, 100, 100, 0.87)",
@@ -96,19 +167,19 @@ const SignInPage = () => {
             variant="outlined"
             inputRef={usernameRef}
           />
-
+          {/* {imgUrl} */}
           <TextField
-            sx={
-              {
-                // margin: "1rem",
-              }
-            }
-            id="outlined-basic"
-            label="image"
-            variant="outlined"
-            inputRef={imageRef}
-          />
-          <br />
+            type="file"
+            onChange={(e) => setImg(e.target.files[0])}
+          ></TextField>
+          {/* <Button
+            variant="contained"
+            sx={{ marginTop: "0.5rem", marginLeft: "1rem" }}
+            onClick={handleClick}
+          >
+            Upload
+          </Button> */}
+          <br /> 
           <TextField
             sx={{
               margin: "1rem",

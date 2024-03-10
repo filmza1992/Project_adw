@@ -3,15 +3,31 @@ import { Box } from "@mui/system";
 import MenuIcon from "@mui/icons-material/Menu";
 import Avatar from "@mui/joy/Avatar";
 import { useNavigate } from "react-router-dom";
-
+import { Users } from "../../model/users";
+import axios from "axios";
+import { useState, useEffect } from "react";
 function Header({ data, type }) {
-  const img = null;
-  console.log("from headUser ");
+
+  const [dataUser, setDataUser] = useState<Users[]>([]);
+  console.log("data from headUser ");
   console.log(data);
-  console.log("from type headUser ");
+  console.log("type from headUser ");
   console.log(type);
+  callApiHeader(data)
   function setImg(img: string) {
     this.img = img;
+  }
+  
+  async function callApiHeader(id: string) {
+      const url = `http://localhost:9000/user/${id}`;
+      try {
+        const response = await axios.get(url);
+        const imagepost: Users[] = response.data;
+        const datacheck = imagepost.data;
+        setDataUser(datacheck);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
   }
   const navigate = useNavigate();
   function navigateToHome() {
@@ -57,7 +73,7 @@ function Header({ data, type }) {
               Logout
             </Button>
           </Typography>
-        
+         <Avatar alt="Remy Sharp" src={dataUser.img_url} />
         </Toolbar>
       </AppBar>
     </Box>

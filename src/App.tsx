@@ -36,7 +36,6 @@ const routers = createBrowserRouter([
   { path: "/imageUpLoad/:id", element: <ImageUpLoadPage /> },
 
   { path: "/changeImg/:id", element: <ChangeImgPage /> },
-
 ]);
   return (
     <>
