@@ -44,9 +44,9 @@ const AdminPage = () => {
   return (
     <>
       {params.id != null && type === "0" ? (
-        <HeaderUser data={params.id} type={type} />
+        <HeaderUser data={params.id} type={type}/>
       ) : params.id != null && type === "1" ? (
-        <HeaderAdmin data={params.id} type={type} />
+        <HeaderAdmin data={params.id} type={type}/>
       ) : (
         <Header />
       )}

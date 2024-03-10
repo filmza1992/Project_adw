@@ -2,36 +2,198 @@ import { Box, Container } from "@mui/system";
 import HeaderUser from "../../component/headerUser";
 import Header from "../../component/header";
 import HeaderAdmin from "../../component/headerAdmin";
-import { AppBar, Toolbar, IconButton, Typography, Button } from "@mui/material";
+import VoteMember from "../../component/voteMember";
+import VoteUser from "../../component/voteUser";
+import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
+import { Avatar } from "@mui/joy"; // Import Avatar from "@mui/joy" instead of "@mui/joy/Avatar"
+import { Typography, IconButton, Button, Toolbar } from "@mui/material";
+import Card from "@mui/joy/Card";
+import CardContent from "@mui/joy/CardContent";
 import { useParams, useSearchParams } from "react-router-dom";
 import { Users } from "../../model/users";
 import axios from "axios";
+import { Vote } from "../../model/Vote";
 import { useState, useEffect } from "react";
+import AspectRatio from "@mui/joy/AspectRatio";
 function HomePage() {
   const params = useParams();
-  const [data, setData] = useState<Users[]>([]);
-
+  const [userData, setUserData] = useState<Users[]>([]);
+  const [VoteData, setVoteData] = useState<Vote[]>([]);
+  const [VoteWinData, setVoteWinData] = useState<Vote[]>([]);
+  const [VoteLossData, setVoteLossData] = useState<Vote[]>([]);
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
-  
+
   useEffect(() => {
     if (params.id != null) {
       callApi(params.id);
     }
   }, [params.id]);
-  console.log(params.id);
+
   async function callApi(id: string) {
+    const url = `http://localhost:9000/user/${id}`;
     try {
-      const url = `http://localhost:9000/user/${id}`;
       const response = await axios.get(url);
-      const users: User[] = response.data;
-      setData(users);
-      console.log(users);
+      const users: Users[] = response.data;
+      const data = users.data;
+      setUserData(data);
+      console.log(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+    const url2 = `http://localhost:9000/vote`;
+    try {
+      const response = await axios.get(url2);
+      const vote: Vote[] = response.data;
+      const data = vote.data;
+
+      setVoteData(data);
+      console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
-  //
+
+  const [players, setPlayers] = useState<Vote[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (VoteData.length > 0) {
+      selectRandomPlayers();
+      setIsLoading(false);
+    }
+  }, [VoteData]);
+
+  const selectRandomPlayers = () => {
+    const playersCopy = [...VoteData];
+    const selectedPlayers: Vote[] = [];
+
+    while (selectedPlayers.length < 2 && playersCopy.length > 0) {
+      const randomIndex = Math.floor(Math.random() * playersCopy.length);
+      const selectedPlayer = playersCopy.splice(randomIndex, 1)[0];
+      selectedPlayers.push(selectedPlayer);
+    }
+
+    setPlayers(selectedPlayers);
+  };
+
+  const updateElo = (winnerId: string, loserId: string) => {
+    const kFactor = 30; // ค่าคงที่ K ใน Elo Rating Algorithm
+
+    const winnerIndex = players.findIndex((player) => player._id === winnerId);
+    const loserIndex = players.findIndex((player) => player._id === loserId);
+
+    const winner = players[winnerIndex];
+    const loser = players[loserIndex];
+
+    const expectedWinProbabilityWinner =
+      1 / (1 + 10 ** ((loser.point - winner.point) / 400));
+    const expectedWinProbabilityLoser =
+      1 / (1 + 10 ** ((winner.point - loser.point) / 400));
+
+    const newEloWinner =
+      winner.point + kFactor * (1 - expectedWinProbabilityWinner);
+    const newEloLoser =
+      loser.point + kFactor * (0 - expectedWinProbabilityLoser);
+
+    const updatedPlayers = [...players];
+    updatedPlayers[winnerIndex].point = Math.round(newEloWinner);
+    updatedPlayers[loserIndex].point = Math.round(newEloLoser);
+    setPlayers(updatedPlayers);
+    // window.location.reload();
+    updatePointWin(
+      winnerId,
+      Math.round(newEloWinner),
+      loserId,
+      Math.round(newEloLoser)
+    );
+  };
+
+  const handleVote = (winnerId: string, loserId: string) => {
+    updateElo(winnerId, loserId);
+    // แสดงผลคะแนนใหม่หลังจากการคำนวณ
+    console.log(players);
+  };
+  console.log("======== data players =========");
+  console.log(players);
+
+  async function updatePointWin(
+    winnerId: string,
+    pointWinner: number,
+    loserId: string,
+    pointLoss: number
+  ) {
+    if (pointLoss <= 0) {
+      pointLoss = 0;
+    }
+    try {
+      const responseWinner = await axios.get(
+        `http://localhost:9000/vote/${winnerId}`
+      );
+      const winnerData: Vote[] = responseWinner.data.data;
+
+      await upPointWin(winnerData, pointWinner);
+
+      const responseLoser = await axios.get(
+        `http://localhost:9000/vote/${loserId}`
+      );
+      const loserData: Vote[] = responseLoser.data.data;
+
+      await upPointLoss(loserData, pointLoss);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
+  async function upPointWin(voteData: Vote[],pointWinner: number) {
+    const bodywinner = {
+      point: pointWinner, // ตั้งค่า point ตามที่ต้องการ
+      img: {
+        img_id: voteData.img.img_id, // กำหนด img_id ตามที่ต้องการ
+        img_url: voteData.img.img_url, // กำหนด img_url ตามที่ต้องการ
+        user: {
+          user_id: voteData.img.user.user_id, // กำหนด user_id ตามที่ต้องการ
+          username: voteData.img.user.username, // กำหนด username ตามที่ต้องการ
+          photoURL: voteData.img.user.photoURL, // กำหนด photoURL ตามที่ต้องการ
+        },
+      },
+      create_at: new Date(),
+    };
+    const urlwinner = `http://localhost:9000/vote/${voteData._id}`;
+    const responsewinner = await axios.put(urlwinner, bodywinner);
+    const resultwinner = responsewinner.data;
+    console.log(resultwinner.message);
+    if (resultwinner.message == "Successful operation") {
+      console.log("Successful Update Winner Vote");
+      // navigate("/profile/" + params.id + "/?type=" + type);
+    } else {
+      console.log("Update Vote not successfully");
+    }
+  }
+  async function upPointLoss(voteData: Vote[],pointLoss: number) {
+    const bodyloser = {
+      point: pointLoss, // ตั้งค่า point ตามที่ต้องการ
+      img: {
+        img_id: voteData.img.img_id, // กำหนด img_id ตามที่ต้องการ
+        img_url: voteData.img.img_url, // กำหนด img_url ตามที่ต้องการ
+        user: {
+          user_id: voteData.img.user.user_id, // กำหนด user_id ตามที่ต้องการ
+          username: voteData.img.user.username, // กำหนด username ตามที่ต้องการ
+          photoURL: voteData.img.user.photoURL, // กำหนด photoURL ตามที่ต้องการ
+        },
+      },
+      create_at: new Date(),
+    };
+    const urlloser = `http://localhost:9000/vote/${voteData._id}`;
+    const responseloser = await axios.put(urlloser, bodyloser);
+    const resultloser = responseloser.data;
+    console.log(resultloser.message);
+    if (resultloser.message == "Successful operation") {
+      console.log("Successful Update Loss Vote");
+      window.location.reload();
+    } else {
+      console.log("Update Vote not successfully");
+    }
+  }
   return (
     <>
       {params.id != null && type === "0" ? (
@@ -42,7 +204,6 @@ function HomePage() {
         <Header />
       )}
 
-      {/* <Head></Head> */}
       <Container
         sx={{ marginTop: "2rem", placeItems: "center", minWidth: "320px" }}
       >
@@ -56,78 +217,170 @@ function HomePage() {
           >
             Choose the picture you like
           </div>
-          {/* <ListImage></ListImage>
-           */}
           <Toolbar sx={{}}>
             <Typography
               variant="h6"
               component="div"
               sx={{ flexGrow: 1 }}
             ></Typography>
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1, width: "400px" }}
-            >
-              <img
-                src="https://images.unsplash.com/photo-1515825838458-f2a94b20105a?auto=format&fit=crop&w=300"
-                srcSet="https://images.unsplash.com/photo-1515825838458-f2a94b20105a?auto=format&fit=crop&w=300&dpr=2 2x"
-                loading="lazy"
-                alt="Yosemite by Casey Horner"
-              />
-            </Typography>
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1 }}
-            ></Typography>
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1, width: "400px" }}
-            >
-              <img
-                src="https://gearbox.imgix.net/https%3A%2F%2Fix-www.imgix.net%2Fsolutions%2Fwindmills.jpg?q=75&auto=format&fm=pjpg&fit=crop&w=456&h=342&ixlib=js-2.0.0&s=0213793bd6afa303564c7356a07a9243"
-                srcSet="https://images.unsplash.com/photo-1515825838458-f2a94b20105a?auto=format&fit=crop&w=300&dpr=2 2x"
-                loading="lazy"
-                alt="Yosemite by Casey Horner"
-              />
-            </Typography>
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1 }}
-            ></Typography>
-          </Toolbar>
-          <br />
-
-          <Toolbar sx={{}}>
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ flexGrow: 1 }}
-            ></Typography>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <Button
-                sx={{ color: "rgba(100, 100, 100, 0.87)" }}
-                //   onClick={navigateTo}
+            <Box sx={{ minHeight: 350, margin: "1rem" }}>
+              <Card
+                variant="outlined"
+                sx={(theme) => ({
+                  width: 300,
+                  gridColumn: "span 2",
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  resize: "horizontal",
+                  overflow: "hidden",
+                  gap: "clamp(0px, (100% - 360px + 32px) * 999, 16px)",
+                  transition: "transform 0.8s, border 0.8s",
+                  "&:hover": {
+                    borderColor: theme.vars.palette.primary.outlinedHoverBorder,
+                    transform: "translateY(-6px)",
+                  },
+                  "& > *": {
+                    minWidth: "clamp(0px, (360px - 100%) * 999,100%)",
+                  },
+                })}
               >
-                Vote
-              </Button>
-            </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
+                    maxWidth: 200,
+                  }}
+                >
+                  <Box sx={{ display: "flex" }}>
+                    <div style={{ textAlign: "left", display: "flex" }}>
+                      <Avatar
+                        variant="soft"
+                        color="neutral"
+                        src={players[0]?.img.user.photoURL}
+                      ></Avatar>
+                      <Typography sx={{ marginLeft: "1rem" }} variant="h6">
+                        {players[0]?.img.user.username}
+                      </Typography>
+                    </div>
+                    <IconButton
+                      size="small" // Changed "sm" to "small"
+                      variant="plain"
+                      color="neutral"
+                      sx={{ ml: "auto", alignSelf: "flex-start" }}
+                    >
+                      <FavoriteBorderRoundedIcon color="danger" />
+                    </IconButton>
+                  </Box>
+                  <AspectRatio
+                    variant="soft"
+                    sx={{
+                      "--AspectRatio-paddingBottom":
+                        "clamp(0px, (100% - 200px) * 999, 200px)",
+                      pointerEvents: "none",
+                    }}
+                  >
+                    <img alt="" src={players[0]?.img.img_url} />
+                  </AspectRatio>
+                  <Box sx={{ display: "flex", gap: 1.5, mt: "auto" }}>
+                    {/* <Avatar variant="soft" color="neutral" src={data?.img_url}></Avatar> */}
+                    <div>
+                      {/* Changed level="body-xs" to variant="body2" */}
+                      {/* <Typography variant="body2">{data.username}</Typography>*/}
+                    </div>
+                  </Box>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Button
+                      sx={{ color: "rgba(100, 100, 100, 0.87)" }}
+                      onClick={() => handleVote(players[0]._id, players[1]._id)}
+                    >
+                      Vote
+                    </Button>
+                  </Box>
+                </Box>
+              </Card>
+            </Box>
             <Typography
               variant="h6"
               component="div"
-              sx={{ flexGrow: 1, paddingLeft: "4.5rem" }}
+              sx={{ flexGrow: 1 }}
             ></Typography>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <Button
-                sx={{ color: "rgba(100, 100, 100, 0.87)" }}
-                //   onClick={navigateTo}
+            <Box sx={{ minHeight: 350, margin: "1rem" }}>
+              <Card
+                variant="outlined"
+                sx={(theme) => ({
+                  width: 300,
+                  gridColumn: "span 2",
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  resize: "horizontal",
+                  overflow: "hidden",
+                  gap: "clamp(0px, (100% - 360px + 32px) * 999, 16px)",
+                  transition: "transform 0.8s, border 0.8s",
+                  "&:hover": {
+                    borderColor: theme.vars.palette.primary.outlinedHoverBorder,
+                    transform: "translateY(-6px)",
+                  },
+                  "& > *": {
+                    minWidth: "clamp(0px, (360px - 100%) * 999,100%)",
+                  },
+                })}
               >
-                Vote
-              </Button>
-            </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
+                    maxWidth: 200,
+                  }}
+                >
+                  <Box sx={{ display: "flex" }}>
+                    <div style={{ textAlign: "left", display: "flex" }}>
+                      <Avatar
+                        variant="soft"
+                        color="neutral"
+                        src={players[1]?.img.user.photoURL}
+                      ></Avatar>
+                      <Typography sx={{ marginLeft: "1rem" }} variant="h6">
+                        {players[1]?.img.user.username}
+                      </Typography>
+                    </div>
+                    <IconButton
+                      size="small" // Changed "sm" to "small"
+                      variant="plain"
+                      color="neutral"
+                      sx={{ ml: "auto", alignSelf: "flex-start" }}
+                    >
+                      <FavoriteBorderRoundedIcon color="danger" />
+                    </IconButton>
+                  </Box>
+                  <AspectRatio
+                    variant="soft"
+                    sx={{
+                      "--AspectRatio-paddingBottom":
+                        "clamp(0px, (100% - 200px) * 999, 200px)",
+                      pointerEvents: "none",
+                    }}
+                  >
+                    <img alt="" src={players[1]?.img.img_url} />
+                  </AspectRatio>
+                  <Box sx={{ display: "flex", gap: 1.5, mt: "auto" }}>
+                    <div>
+                      {/* Changed level="body-xs" to variant="body2" */}
+                      {/* <Typography variant="body2">{data.username}</Typography>*/}
+                    </div>
+                  </Box>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Button
+                      sx={{ color: "rgba(100, 100, 100, 0.87)" }}
+                      onClick={() => handleVote(players[1]._id, players[0]._id)}
+                    >
+                      Vote
+                    </Button>
+                  </Box>
+                </Box>
+              </Card>
+            </Box>
             <Typography
               variant="h6"
               component="div"

@@ -20,10 +20,11 @@ import { Admin } from "../../model/Admin";
 import { Image } from "../../model/Image";
 import { User } from "firebase/auth";
 
-const ProfilePage = () => {
+const ShowProfilePage = () => {
   const params = useParams();
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
+  const showid = searchParams.get("showid");
   const [adminData, setAdminData] = useState<Admin[]>([]);
   const [userData, setUserData] = useState<User[]>([]);
   const [ImageData, setImageData] = useState<Image[]>([]);
@@ -31,24 +32,13 @@ const ProfilePage = () => {
   const navigate = useNavigate(); // ย้ายไปข้างบน
 
   useEffect(() => {
-    if (params.id != null) {
-      callApi(params.id, type);
+    if (showid != null) {
+      callApi(showid, type);
     }
-  }, [params.id]);
+  }, [showid]);
 
   async function callApi(id: string, type: string) {
-    if (type == "1") {
-      const url = `http://localhost:9000/admin/${id}`;
-      try {
-        const response = await axios.get(url);
-        const admin: Admin[] = response.data;
-        const data = admin.data;
-        setAdminData(data);
-        setData(data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    } else {
+    
       const url = `http://localhost:9000/user/${id}`;
       try {
         const response = await axios.get(url);
@@ -69,42 +59,7 @@ const ProfilePage = () => {
         console.error("Error fetching data:", error);
       }
     }
-  }
-
-  function navigateToUpLoadProfile() {
-    navigate(
-      "/UpLoadProfile/" +
-        data?._id +
-        "/?type=" +
-        type +
-        "&name=" +
-        data.username +
-        "&phone=" +
-        data.phone +
-        "&birthday=" +
-        data.birth_day 
-    ); // ใส่เช็คว่า data ไม่ใช่ null ก่อนที่จะเรียกใช้
-  }
-  async function DeleteImage(id: string) {
-    const url = `http://localhost:9000/image/${id}`;
-    try {
-      await axios.delete(url);
-      // รีเฟรชหน้าเว็บ
-      window.location.reload();
-      // หรือสามารถใช้ useEffect เรียก callApi ใหม่ได้
-      // useEffect(() => {
-      //   callApi(params.id, type);
-      // }, []);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }
-  function navigateToEditImage() {
-    navigate("/changeImg/" + data?._id + "/?type=" + type);
-  }
-  function navigateToImgUploade() {
-    navigate("/ImageUpLoad/" + data?._id + "/?type=" + type);
-  }
+ 
   return (
     <>
       {params.id != null && type === "0" ? (
@@ -125,14 +80,13 @@ const ProfilePage = () => {
                 marginBottom: "1rem",
               }}
             >
-              <h1  style={{margin : "1.5rem"}}>My Profile </h1>
+              <h1>{data?.username} Profile </h1>
             </Box>
             <Box
               sx={{
                 display: "flex",
                 justifyContent: "right",
                 marginRight: "3rem",
-
                 marginBottom: "3rem",
               }}
             >
@@ -164,35 +118,19 @@ const ProfilePage = () => {
                   >
                     {data?.email}
                   </Typography>
-                  <Button
-                    sx={{
-                      color: "rgba(100, 100, 100, 0.87)",
-                    }}
-                    onClick={navigateToUpLoadProfile}
-                  >
-                    Edit Profile
-                  </Button>
+                  
                 </CardContent>
               </Card>
-              {params.id != null && type === "0" ? (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  component="span"
-                  sx={{ marginLeft: "1rem" }}
-                  onClick={navigateToImgUploade}
-                >
-                  Upload Picture
-                </Button>
-              ) : null}
+              
             </Box>
           </Box>
           <div>
-            <Grid
+            <Grid 
               container
               spacing={0.5}
+
               columns={{ xs: 4, sm: 8, md: 12 }}
-              sx={{ flexGrow: 1 }}
+              sx={{ flexGrow: 1 ,marginLeft : "2.5rem"}}
             >
               {ImageData.map((item, index)  => {
                 return (
@@ -270,27 +208,7 @@ const ProfilePage = () => {
                             </Typography>
                           </div>
                         </Box>
-                        <Box sx={{ display: "flexGrow: 1 " }}>
-                          <Button
-                            sx={{
-                              color: "rgba(100, 100, 100, 0.87)",
-                              marginRight: "1rem",
-                            }}
-                            onClick={() => DeleteImage(ImageData[index]._id)}
-                          >
-                            Delete
-                          </Button>
-
-                          <Button
-                            sx={{
-                              color: "rgba(100, 100, 100, 0.87)",
-                              marginLeft: "1rem",
-                            }}
-                            onClick={navigateToEditImage}
-                          >
-                            Edit
-                          </Button>
-                        </Box>
+                        
                       </Box>
                     </Card>
                   </Box>
@@ -304,4 +222,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default ShowProfilePage;

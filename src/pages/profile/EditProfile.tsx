@@ -14,6 +14,7 @@ import Chip from "@mui/joy/Chip";
 import Typography from "@mui/joy/Typography";
 import { useEffect, useRef, useState } from "react";
 import { Users } from "../../model/users";
+import { Admin } from "../../model/Admin";
 import axios from "axios";
 import { Button } from "@mui/material";
 import HeaderUser from "../../component/headerUser";
@@ -36,11 +37,14 @@ const EditProfilePage = () => {
   const name = searchParams.get("name");
   const birth_day = searchParams.get("birthday");
   const phone = searchParams.get("phone");
-  const [data, setData] = useState<Users[]>([]);
+  const [adminData, setAdminData] = useState<Admin[]>([]);
+  const [userData, setUserData] = useState<User[]>([]);
+  const [data, setData] = useState<any>(null);
   const params = useParams();
   const [img, setImg] = useState();
   const [imgUrl, setImgUrl] = useState([]);
   const [imgUrlTmp, setImgUrlTmp] = useState();
+  
   useEffect(() => {
     console.log(88);
     listAll(ref(imgDB, "files")).then((imgs) => {
@@ -74,8 +78,13 @@ const EditProfilePage = () => {
 
         // ตรวจสอบว่ามีรูปที่อัปโหลดเสร็จแล้วหรือไม่
         if (imgUrlTmp) {
-          console.log("index ==== : " + imgUrlTmp);
-          upUser(imgUrlTmp);
+          if (type == "0") {
+            upUser(imgUrlTmp);
+          }
+          else{
+            upAdmin(imgUrlTmp);
+          }
+          
           // ทำงานเมื่อมีรูปที่อัปโหลดเสร็จแล้ว
           // สามารถเรียกใช้โค้ดที่ต้องการทำงานต่อไปได้ที่นี่
         }
@@ -118,9 +127,7 @@ const EditProfilePage = () => {
         });
       });
     }
-    else{
-      upUser(data.img_url);
-    }
+
   }
 
   // navigate("/");
@@ -147,8 +154,35 @@ const EditProfilePage = () => {
       const user = users.data;
       setData(user);
       console.log(user);
-      console.log(user._id);
-      navigate("/profile/" + user._id + "/?type=" + type);
+      navigate("/profile/" + params.id + "/?type=" + type);
+    } else {
+      alert("รหัสผ่านไม่ตรงกันกรุณาป้อนรหัสผ่านใหม่");
+    }
+  }
+  async function upAdmin(myurl: string) {
+    const body = {
+      img_url: myurl,
+      username: usernameRef.current?.value,
+      phone: phoneRef.current?.value,
+      birth_day: birth_dayRef.current?.value,
+    };
+    const url = `http://localhost:9000/admin/${params.id}`;
+    const response = await axios.put(url, body);
+    const result = response.data;
+    console.log("=== result.message ===");
+    console.log(result.message);
+
+    if (result.message == "Successful operation") {
+      console.log("Successful operation");
+      const url = `http://localhost:9000/admin/${params.id}`;
+      console.log(url);
+      const response = await axios.get(url);
+      const admins: Admin[] = response.data;
+      const admin = admins.data;
+      setData(admin);
+      console.log(admin);
+      console.log(admin._id);
+      navigate("/profile/" + params.id + "/?type=" + type);
     } else {
       alert("รหัสผ่านไม่ตรงกันกรุณาป้อนรหัสผ่านใหม่");
     }
@@ -156,9 +190,9 @@ const EditProfilePage = () => {
   return (
     <>
       {params.id != null && type === "0" ? (
-        <HeaderUser data={params.id} type={type} />
+        <HeaderUser data={params.id} type={type}/>
       ) : params.id != null && type === "1" ? (
-        <HeaderAdmin data={params.id} type={type} />
+        <HeaderAdmin data={params.id} type={type}/>
       ) : (
         <Header />
       )}

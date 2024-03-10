@@ -12,6 +12,8 @@ import ChooseLoginPage from './pages/login/ChooseLogin'
 import LoginUserPage from './pages/login/loginuser'
 import AdminPage from './pages/admin/admin'
 import ImageUpLoadPage from './pages/image/imageUpload'
+import ShowProfilePage from './pages/profile/ShowProfile'
+import ListProfilePage from './pages/profile/ListProfile'
 function App() {
 
 const routers = createBrowserRouter([
@@ -26,6 +28,9 @@ const routers = createBrowserRouter([
   { path: "/rank", element: <RankPage /> },
 
   { path: "/profile/:id", element: <ProfilePage /> },
+  { path: "/ShowProfile/:id", element: <ShowProfilePage /> },
+  { path: "/ListProfile/:id", element: <ListProfilePage /> },
+  
 
   { path: "/signIn", element: <SignInPage /> },
 

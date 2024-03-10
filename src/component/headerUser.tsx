@@ -6,29 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Users } from "../../model/users";
 import axios from "axios";
 import { useState, useEffect } from "react";
-function Header({ data, type }) {
-
-  const [dataUser, setDataUser] = useState<Users[]>([]);
-  console.log("data from headUser ");
-  console.log(data);
-  console.log("type from headUser ");
-  console.log(type);
-  callApiHeader(data)
-  function setImg(img: string) {
-    this.img = img;
-  }
-  
-  async function callApiHeader(id: string) {
-      const url = `http://localhost:9000/user/${id}`;
-      try {
-        const response = await axios.get(url);
-        const imagepost: Users[] = response.data;
-        const datacheck = imagepost.data;
-        setDataUser(datacheck);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-  }
+function Header({ data, type}) {
   const navigate = useNavigate();
   function navigateToHome() {
     navigate("/"+data+"/?type="+type);
@@ -60,20 +38,19 @@ function Header({ data, type }) {
             sx={{ flexGrow: 1 }}
           ></Typography>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            <Button color="inherit" onClick={navigateToHome}>
+            <Button color="inherit" sx={{margin : "0.3rem"}}onClick={navigateToHome}>
               Home
             </Button>
-            <Button color="inherit" onClick={navigateToRank}>
+            <Button color="inherit" sx={{margin : "0.3rem"}}onClick={navigateToRank}>
               Rank
             </Button>
-            <Button color="inherit" onClick={navigateToProfile}>
+            <Button color="inherit" sx={{margin : "0.3rem"}}onClick={navigateToProfile}>
               Profile
             </Button>
-            <Button color="inherit" onClick={navigateToLogin}>
+            <Button color="inherit" sx={{margin : "0.3rem"}}onClick={navigateToLogin}>
               Logout
             </Button>
           </Typography>
-         <Avatar alt="Remy Sharp" src={dataUser.img_url} />
         </Toolbar>
       </AppBar>
     </Box>
