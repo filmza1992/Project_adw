@@ -28,7 +28,24 @@ const RankPage = () => {
   const params = useParams();
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
+  useEffect(() => {
+    if (params.id == null) {
+      callApiVote(params.id);
+    }
+  }, [params.id]);
 
+  async function callApiVote(id: string) {
+    const url2 = `http://localhost:9000/vote/sort`;
+    try {
+      const response = await axios.get(url2);
+      const vote: Vote[] = response.data;
+      const data = vote.data;
+      setVoteData(data);
+      console.log(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
   useEffect(() => {
     if (params.id != null) {
       callApi(params.id, type);

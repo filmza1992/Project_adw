@@ -18,8 +18,10 @@ import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded
 import { useEffect, useState } from "react";
 import { Admin } from "../../model/Admin";
 import { Image } from "../../model/Image";
+import { Vote } from "../../model/Vote";
 import { User } from "firebase/auth";
-
+import Alert from "@mui/joy/Alert";
+import WarningIcon from "@mui/icons-material/Warning";
 const ProfilePage = () => {
   const params = useParams();
   const [searchParams] = useSearchParams();
@@ -27,9 +29,9 @@ const ProfilePage = () => {
   const [adminData, setAdminData] = useState<Admin[]>([]);
   const [userData, setUserData] = useState<User[]>([]);
   const [ImageData, setImageData] = useState<Image[]>([]);
+  const [VoteData, setVoteData] = useState<Vote[]>([]);
   const [data, setData] = useState<any>(null);
   const navigate = useNavigate(); // ย้ายไปข้างบน
-
   useEffect(() => {
     if (params.id != null) {
       callApi(params.id, type);
@@ -68,6 +70,16 @@ const ProfilePage = () => {
       } catch (error) {
         console.error("Error fetching data:", error);
       }
+      const url2 = `http://localhost:9000/vote/user/${id}`;
+      try {
+        const response = await axios.get(url2);
+        const vote: Vote[] = response.data;
+        const data = vote.data;
+        setVoteData(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     }
   }
 
@@ -82,38 +94,45 @@ const ProfilePage = () => {
         "&phone=" +
         data.phone +
         "&birthday=" +
-        data.birth_day 
+        data.birth_day
     ); // ใส่เช็คว่า data ไม่ใช่ null ก่อนที่จะเรียกใช้
   }
-  async function DeleteImage(id: string) {
+  async function DeleteImage(id: string,idvote : string) {
     const url = `http://localhost:9000/image/${id}`;
     try {
       await axios.delete(url);
-      // รีเฟรชหน้าเว็บ
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+    const url2 = `http://localhost:9000/vote/${idvote}`;
+    try {
+      await axios.delete(url2);
       window.location.reload();
-      // หรือสามารถใช้ useEffect เรียก callApi ใหม่ได้
-      // useEffect(() => {
-      //   callApi(params.id, type);
-      // }, []);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
-  function navigateToEditImage() {
-    navigate("/changeImg/" + data?._id + "/?type=" + type);
+  function navigateToEditImage(id: string) {
+    navigate("/changeImg/" + data?._id + "/?type=" + type + "&img_id=" + id);
   }
   function navigateToImgUploade() {
-    navigate("/ImageUpLoad/" + data?._id + "/?type=" + type);
+    if (VoteData.length >= 5) {
+      alert("You can upload a maximum of 5 photos only.");
+    } else {
+      navigate("/ImageUpLoad/" + data?._id + "/?type=" + type);
+    }
   }
   return (
     <>
+    
       {params.id != null && type === "0" ? (
-        <HeaderUser data={params.id} type={type}/>
+        <HeaderUser data={params.id} type={type} />
       ) : params.id != null && type === "1" ? (
-        <HeaderAdmin data={params.id} type={type}/>
+        <HeaderAdmin data={params.id} type={type} />
       ) : (
         <Header />
       )}
+
       <Container sx={{}}>
         <Box sx={{}}>
           <Box sx={{}}>
@@ -125,7 +144,7 @@ const ProfilePage = () => {
                 marginBottom: "1rem",
               }}
             >
-              <h1  style={{margin : "1.5rem"}}>My Profile </h1>
+              <h1 style={{ margin: "1.5rem" }}>My Profile </h1>
             </Box>
             <Box
               sx={{
@@ -194,7 +213,7 @@ const ProfilePage = () => {
               columns={{ xs: 4, sm: 8, md: 12 }}
               sx={{ flexGrow: 1 }}
             >
-              {ImageData.map((item, index)  => {
+              {ImageData.map((item, index) => {
                 return (
                   <Box sx={{ minHeight: 350, margin: "1rem" }}>
                     <Card
@@ -241,6 +260,12 @@ const ProfilePage = () => {
                             color="neutral"
                             sx={{ ml: "auto", alignSelf: "flex-start" }}
                           >
+                            <Typography
+                              level="body-sm"
+                              sx={{ marginRight: "0.5rem" }}
+                            >
+                              {VoteData[index]?.point}
+                            </Typography>
                             <FavoriteBorderRoundedIcon color="danger" />
                           </IconButton>
                         </Box>
@@ -252,10 +277,7 @@ const ProfilePage = () => {
                             pointerEvents: "none",
                           }}
                         >
-                          <img
-                            alt=""
-                            src={ImageData[index].img_url}
-                          />
+                          <img alt="" src={ImageData[index].img_url} />
                         </AspectRatio>
                         <Box sx={{ display: "flex", gap: 1.5, mt: "auto" }}>
                           <Avatar
@@ -270,13 +292,14 @@ const ProfilePage = () => {
                             </Typography>
                           </div>
                         </Box>
+
                         <Box sx={{ display: "flexGrow: 1 " }}>
                           <Button
                             sx={{
                               color: "rgba(100, 100, 100, 0.87)",
                               marginRight: "1rem",
                             }}
-                            onClick={() => DeleteImage(ImageData[index]._id)}
+                            onClick={() => DeleteImage(ImageData[index]._id,VoteData[index]._id)}
                           >
                             Delete
                           </Button>
@@ -286,7 +309,9 @@ const ProfilePage = () => {
                               color: "rgba(100, 100, 100, 0.87)",
                               marginLeft: "1rem",
                             }}
-                            onClick={navigateToEditImage}
+                            onClick={() =>
+                              navigateToEditImage(ImageData[index]._id)
+                            }
                           >
                             Edit
                           </Button>

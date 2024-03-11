@@ -251,6 +251,7 @@ const EditProfilePage = () => {
                 // margin: "1rem",
               }
             }
+            
             id="outlined-basic"
             // label="birthday"
             defaultValue={birth_day}
