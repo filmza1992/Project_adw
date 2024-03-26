@@ -22,7 +22,9 @@ function Header() {
       >
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          <div onClick={navigateToHome} style={{cursor : "pointer"}}>View</div>
+            <div onClick={navigateToHome} style={{ cursor: "pointer" }}>
+              View
+            </div>
           </Typography>
           <Typography
             variant="h6"
@@ -30,9 +32,15 @@ function Header() {
             sx={{ flexGrow: 1 }}
           ></Typography>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            <Button color="inherit" onClick={navigateToHome}>Home</Button>
-            <Button color="inherit" onClick={navigateToRank}>Rank</Button>
-            <Button color="inherit" onClick={navigateToLogin}>Login</Button>
+            <Button color="inherit" onClick={navigateToHome}>
+              Vote
+            </Button>
+            <Button color="inherit" onClick={navigateToRank}>
+              Rank
+            </Button>
+            <Button color="inherit" onClick={navigateToLogin}>
+              Login
+            </Button>
           </Typography>
         </Toolbar>
       </AppBar>

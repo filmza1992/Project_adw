@@ -128,6 +128,7 @@ const RankPage = () => {
                 <th style={{ textAlign: "center" }}>Point</th>
               </tr>
             </thead>
+
             {VoteData.slice(0, 10).map((arr, index) => {
               return (
                 <tbody>

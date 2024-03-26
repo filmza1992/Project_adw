@@ -50,13 +50,13 @@ function HomePage() {
       const loadDataAsync = async () => {
         await delay(TimeSetData[0]?.time_set * 1000);
         setIsLoadingData(false);
-        callApiVote(params.id);
+        callApiVote();
       };
       loadDataAsync();
     }
   }, [TimeSetData, params.id]);
 
-  async function callApiVote(id: string) {
+  async function callApiVote() {
     const url2 = `http://localhost:9000/vote`;
     try {
       const response = await axios.get(url2);
@@ -88,7 +88,7 @@ function HomePage() {
       const loadDataAsync = async () => {
         await delay(TimeSetData[0]?.time_set * 1000);
         setIsLoadingData(false);
-        callApiVote(params.id);
+        callApiVote();
       };
       loadDataAsync();
     }
@@ -261,13 +261,45 @@ function HomePage() {
       Math.round(newEloLoser)
     );
   };
+  const updateLocalStorage = (data) => {
+    localStorage.setItem("dataWinner", JSON.stringify(data));
+  };
 
-  const handleVote = (winnerId: string, loserId: string) => {
+  const handleVote = (winnerId, loserId) => {
+    //
+    let id;
+    let time;
+    let timedate;
+    if (winnerId === players[0]._id) {
+      id = players[0].img.img_id;
+      time = TimeSetData[0].time_set * 1000;
+      timedate = Date();
+    } else {
+      id = players[1].img.img_id;
+      time = TimeSetData[0].time_set * 1000;
+      timedate = Date();
+    }
     updateElo(winnerId, loserId);
-    // แสดงผลคะแนนใหม่หลังจากการคำนวณ
-
+    // Check if id already exists in localStorageData
+    // let localStorageData = JSON.parse(localStorage.getItem("dataWinner")) || [];
+    // let idExists = localStorageData.some((player) => player.id === id);
+    // if (!idExists) {
+    //   localStorageData.push({ id, time, timedate });
+    //   // updateLocalStorage(localStorageData);
+    // updateElo(winnerId, loserId);
+    //   // startTimers(); // อัปเดตค่าใน localStorage
+    // } else {
+    //   alert("Cannot Vote");
+    // }
+    const winnerData = localStorageData.find((data) => data.id === winnerId);
+    if (winnerData) {
+      console.log("timedate of winner:", winnerData.timedate);
+    } else {
+      console.log("No data found for winnerId:", winnerId);
+    }
     console.log(playerscall);
   };
+
   const [setpoint0, sets1point] = useState(null);
   const [setpoint1, sets2point] = useState(null);
   const [persistentSetpoint1, setPersistentSetpoint1] = useState(null);
@@ -472,14 +504,19 @@ function HomePage() {
                         navigateToShowProfile(players[0]?.img.user.user_id)
                       }
                     >
-                      <Avatar
-                        variant="soft"
-                        color="neutral"
-                        src={players[0]?.img.user.photoURL}
-                      ></Avatar>
-                      <Typography sx={{ marginLeft: "1rem" }} variant="h6">
-                        {players[0]?.img.user.username}
-                      </Typography>
+                      {" "}
+                      {params?.id != null ? (
+                        <>
+                          <Avatar
+                            variant="soft"
+                            color="neutral"
+                            src={players[0]?.img.user.photoURL}
+                          ></Avatar>
+                          <Typography sx={{ marginLeft: "1rem" }} variant="h6">
+                            {players[0]?.img.user.username}
+                          </Typography>
+                        </>
+                      ) : null}
                     </div>
 
                     <IconButton
@@ -564,14 +601,18 @@ function HomePage() {
                         navigateToShowProfile(players[1]?.img.user.user_id)
                       }
                     >
-                      <Avatar
-                        variant="soft"
-                        color="neutral"
-                        src={players[1]?.img.user.photoURL}
-                      ></Avatar>
-                      <Typography sx={{ marginLeft: "1rem" }} variant="h6">
-                        {players[1]?.img.user.username}
-                      </Typography>
+                      {params?.id != null ? (
+                        <>
+                          <Avatar
+                            variant="soft"
+                            color="neutral"
+                            src={players[1]?.img.user.photoURL}
+                          ></Avatar>
+                          <Typography sx={{ marginLeft: "1rem" }} variant="h6">
+                            {players[1]?.img.user.username}
+                          </Typography>
+                        </>
+                      ) : null}
                     </div>
 
                     <IconButton
@@ -699,11 +740,11 @@ function HomePage() {
                       ) : (
                         <>
                           <p>
-                            EA = 1 / (1 + 10 ** (({setpoint1} - {setpoint0}) /
+                            EA = 1 / (1 + 10 ^ (({setpoint1} - {setpoint0}) /
                             400))
                           </p>
                           <p>
-                            New Point : {setpoint0} + {kFactor} (1 -{" "}
+                            New Point : {setpoint0} + {kFactor} (0 -{" "}
                             {(
                               1 / (1 + 10 ** ((setpoint1 - setpoint0) / 400)) ||
                               0
@@ -786,11 +827,11 @@ function HomePage() {
                       ) : (
                         <>
                           <p>
-                            EA = 1 / (1 + 10 ** (({setpoint0} - {setpoint1}) /
+                            EA = 1 / (1 + 10 ^ (({setpoint0} - {setpoint1}) /
                             400))
                           </p>
                           <p>
-                            New Point : {setpoint1} + {kFactor} (1 -{" "}
+                            New Point : {setpoint1} + {kFactor} (0 -{" "}
                             {(
                               1 / (1 + 10 ** ((setpoint0 - setpoint1) / 400)) ||
                               0

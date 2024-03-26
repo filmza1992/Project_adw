@@ -153,29 +153,28 @@ const ChangeImgPage = () => {
   async function upVote(_id: string) {
     console.log("data img");
     console.log(VoteData);
-    const body = {
+    const bodywinner = {
       point: 0, // ตั้งค่า point ตามที่ต้องการ
       img: {
         img_id: img_id, // กำหนด img_id ตามที่ต้องการ
         img_url: imgUrlTmp, // กำหนด img_url ตามที่ต้องการ
         user: {
           user_id: params.id, // กำหนด user_id ตามที่ต้องการ
-          username: userData.username, // กำหนด username ตามที่ต้องการ
+          username: userData.username,
           photoURL: userData.img_url, // กำหนด photoURL ตามที่ต้องการ
         },
       },
       create_at: new Date(),
     };
-
-    const url = `http://localhost:9000/vote/${VoteData[0]._id}`;
-    const response = await axios.put(url, body);
-    const result = response.data;
-    console.log(result.message);
-    if (result.message == "Successful operation") {
-      console.log("Successful operation");
+    const urlwinner = `http://localhost:9000/vote`;
+    const responsewinner = await axios.post(urlwinner, bodywinner);
+    const resultwinner = responsewinner.data;
+    console.log(resultwinner.message);
+    if (resultwinner.message == "created Vote successfully") {
+      console.log("Successful Update Winner Vote");
       navigate("/profile/" + params.id + "/?type=" + type);
     } else {
-      console.log("Update Vote not successfully");
+      console.log("created Vote not successfully");
     }
   }
 

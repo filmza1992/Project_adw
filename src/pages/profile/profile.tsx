@@ -22,6 +22,7 @@ import { Vote } from "../../model/Vote";
 import { User } from "firebase/auth";
 import Alert from "@mui/joy/Alert";
 import WarningIcon from "@mui/icons-material/Warning";
+import { LineChart } from "@mui/x-charts";
 const ProfilePage = () => {
   const params = useParams();
   const [searchParams] = useSearchParams();
@@ -75,7 +76,28 @@ const ProfilePage = () => {
         const response = await axios.get(url2);
         const vote: Vote[] = response.data;
         const data = vote.data;
-        setVoteData(data);
+        const seen = new Set();
+        const updatedData: Vote[] = [];
+        data.forEach((item) => {
+          const imgId = item.img.img_id;
+          if (!seen.has(imgId)) {
+            seen.add(imgId);
+            updatedData.push(item);
+          } else {
+            const existingIndex = updatedData.findIndex(
+              (existingItem) => existingItem.img.img_id === imgId
+            );
+            if (existingIndex !== -1) {
+              updatedData[existingIndex] = item;
+            }
+          }
+        });
+        // เรียงลำดับ updatedData ตามค่า point ของแต่ละอ็อบเจกต์
+
+        console.log("======updatedData=====");
+        console.log(updatedData);
+        setVoteData(updatedData);
+
         console.log(data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -146,7 +168,7 @@ const ProfilePage = () => {
                 marginBottom: "1rem",
               }}
             >
-              <h1 style={{ margin: "1.5rem" }}>Statistics</h1>
+              <h1 style={{ margin: "1.5rem" }}>Profile</h1>
             </Box>
             <Box
               sx={{
@@ -219,7 +241,6 @@ const ProfilePage = () => {
                 <Box key={index} sx={{ minHeight: 350, margin: "1rem" }}>
                   <Card
                     variant="outlined"
-                    onClick={() => navigateToStat(item._id)}
                     sx={(theme) => ({
                       width: 300,
                       gridColumn: "span 2",
@@ -292,6 +313,16 @@ const ProfilePage = () => {
                           </Typography>
                         </div>
                       </Box>
+                      <LineChart
+                        xAxis={[{ data: [1, 2, 3, 5, 8, 10, 14] }]}
+                        series={[
+                          {
+                            data: [2, 5.5, 2, 8.5, 1.5, 5, 5],
+                          },
+                        ]}
+                        width={260}
+                        height={210}
+                      />
                       <Box sx={{ flexGrow: 1 }}>
                         <Button
                           sx={{
