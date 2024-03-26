@@ -41,6 +41,7 @@ function HomePage() {
   useEffect(() => {
     if (params.id == null) {
       callApiTimeSet();
+    } else {
     }
   }, [params.id]);
 
@@ -87,8 +88,7 @@ function HomePage() {
       const loadDataAsync = async () => {
         await delay(TimeSetData[0]?.time_set * 1000);
         setIsLoadingData(false);
-        console.log(TimeSetData[0]?.time_set * 1000);
-        callApi(params.id);
+        callApiVote(params.id);
       };
       loadDataAsync();
     }

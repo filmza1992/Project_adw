@@ -71,6 +71,7 @@ const RankPage = () => {
   useEffect(() => {
     if (params.id != null) {
       callApi(params.id, type);
+      callApiVote(params.id);
     }
   }, [params.id]);
 
@@ -97,15 +98,6 @@ const RankPage = () => {
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-    }
-    const url2 = `http://localhost:9000/vote/sort`;
-    try {
-      const response = await axios.get(url2);
-      const vote: Vote[] = response.data;
-      const data = vote.data;
-      setVoteData(data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
     }
   }
   console.log(ImageData);
