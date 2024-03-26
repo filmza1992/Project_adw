@@ -121,27 +121,27 @@ function imageUpLoadPage() {
     } catch (error) {
       console.error("Error posting image:", error);
     }
-}
+  }
 
-async function callmage() {
+  async function callmage() {
     const urlimage = `http://localhost:9000/image`;
     try {
-        const response = await axios.get(urlimage);
-        const image: Image[] = response.data;
-        const data = image.data;
-        setImageData(data);
-        console.log(data[data.length-1]._id);
-        upVote(data[data.length-1]._id);
+      const response = await axios.get(urlimage);
+      const image: Image[] = response.data;
+      const data = image.data;
+      setImageData(data);
+      console.log(data[data.length - 1]._id);
+      upVote(data[data.length - 1]._id);
     } catch (error) {
-        console.error("Error fetching data:", error);
+      console.error("Error fetching data:", error);
     }
-}
+  }
 
-  async function upVote(_id : string) {
+  async function upVote(_id: string) {
     console.log("data img");
     console.log(_id);
     const body = {
-      point: 100, // ตั้งค่า point ตามที่ต้องการ
+      point: 0, // ตั้งค่า point ตามที่ต้องการ
       img: {
         img_id: _id, // กำหนด img_id ตามที่ต้องการ
         img_url: imgUrlTmp, // กำหนด img_url ตามที่ต้องการ

@@ -154,7 +154,7 @@ const ChangeImgPage = () => {
     console.log("data img");
     console.log(VoteData);
     const body = {
-      point: 100, // ตั้งค่า point ตามที่ต้องการ
+      point: 0, // ตั้งค่า point ตามที่ต้องการ
       img: {
         img_id: img_id, // กำหนด img_id ตามที่ต้องการ
         img_url: imgUrlTmp, // กำหนด img_url ตามที่ต้องการ
@@ -166,7 +166,7 @@ const ChangeImgPage = () => {
       },
       create_at: new Date(),
     };
-    
+
     const url = `http://localhost:9000/vote/${VoteData[0]._id}`;
     const response = await axios.put(url, body);
     const result = response.data;
@@ -188,7 +188,7 @@ const ChangeImgPage = () => {
       ) : (
         <Header />
       )}
-      
+
       <Container sx={{}}>
         <Box
           sx={{
@@ -209,7 +209,10 @@ const ChangeImgPage = () => {
               }}
             >
               <form>
-                <TextField type="file"  onChange={(e) => setImg(e.target.files[0])} />
+                <TextField
+                  type="file"
+                  onChange={(e) => setImg(e.target.files[0])}
+                />
                 <Button
                   style={{ marginLeft: "1rem", marginTop: "0.5rem" }}
                   variant="contained"

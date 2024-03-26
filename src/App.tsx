@@ -14,6 +14,7 @@ import AdminPage from './pages/admin/admin'
 import ImageUpLoadPage from './pages/image/imageUpload'
 import ShowProfilePage from './pages/profile/ShowProfile'
 import ListProfilePage from './pages/profile/ListProfile'
+import StatPage from './pages/statistic/stat'
 function App() {
 
 const routers = createBrowserRouter([
@@ -30,7 +31,7 @@ const routers = createBrowserRouter([
   { path: "/profile/:id", element: <ProfilePage /> },
   { path: "/ShowProfile/:id", element: <ShowProfilePage /> },
   { path: "/ListProfile/:id", element: <ListProfilePage /> },
-  
+  { path: "/stat/:id", element: <StatPage /> },
 
   { path: "/signIn", element: <SignInPage /> },
 

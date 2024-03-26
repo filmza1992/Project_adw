@@ -1,4 +1,4 @@
-import { Box, Container, textAlign } from "@mui/system";
+import { Box, Container } from "@mui/system";
 import { useNavigate } from "react-router-dom";
 import { Button, Grid } from "@mui/material";
 import HeaderAdmin from "../../component/headerAdmin";
@@ -10,9 +10,7 @@ import Card from "@mui/joy/Card";
 import CardContent from "@mui/joy/CardContent";
 import Typography from "@mui/joy/Typography";
 import IconButton from "@mui/joy/IconButton";
-import Link from "@mui/joy/Link";
 import { useParams, useSearchParams } from "react-router-dom";
-import { Users } from "../../model/users";
 import axios from "axios";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import { useEffect, useState } from "react";
@@ -20,12 +18,12 @@ import { Admin } from "../../model/Admin";
 import { Image } from "../../model/Image";
 import { Vote } from "../../model/Vote";
 import { User } from "firebase/auth";
-import Alert from "@mui/joy/Alert";
-import WarningIcon from "@mui/icons-material/Warning";
-const ProfilePage = () => {
+import { BarChart } from "@mui/x-charts/BarChart";
+const StatPage = () => {
   const params = useParams();
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
+  const img_id = searchParams.get("img_id");
   const [adminData, setAdminData] = useState<Admin[]>([]);
   const [userData, setUserData] = useState<User[]>([]);
   const [ImageData, setImageData] = useState<Image[]>([]);
@@ -64,15 +62,15 @@ const ProfilePage = () => {
       const url1 = `http://localhost:9000/image/user/${id}`;
       try {
         const response = await axios.get(url1);
-        const imagepost: Image[] = response.data;
+        const imagepost: image[] = response.data;
         const data = imagepost.data;
         setImageData(data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-      const url2 = `http://localhost:9000/vote/user/${id}`;
+      const url3 = `http://localhost:9000/vote/${img_id}`;
       try {
-        const response = await axios.get(url2);
+        const response = await axios.get(url3);
         const vote: Vote[] = response.data;
         const data = vote.data;
         setVoteData(data);
@@ -122,9 +120,6 @@ const ProfilePage = () => {
       navigate("/ImageUpLoad/" + data?._id + "/?type=" + type);
     }
   }
-  function navigateToStat(id: string) {
-    navigate("/stat/" + data?._id + "/?type=" + type + "&img_id=" + id);
-  }
   return (
     <>
       {params.id != null && type === "0" ? (
@@ -146,7 +141,7 @@ const ProfilePage = () => {
                 marginBottom: "1rem",
               }}
             >
-              <h1 style={{ margin: "1.5rem" }}>Statistics</h1>
+              <h1 style={{ margin: "1.5rem" }}>My Profile </h1>
             </Box>
             <Box
               sx={{
@@ -208,115 +203,113 @@ const ProfilePage = () => {
               ) : null}
             </Box>
           </Box>
-          <div>
-            <Grid
-              container
-              spacing={0.5}
-              columns={{ xs: 4, sm: 8, md: 12 }}
-              sx={{ flexGrow: 1 }}
+          <Box sx={{ minHeight: 350, margin: "1rem" }}>
+            <Card
+              variant="outlined"
+              sx={(theme) => ({
+                width: 300,
+                gridColumn: "span 2",
+                flexDirection: "row",
+                flexWrap: "wrap",
+                resize: "horizontal",
+                overflow: "hidden",
+                gap: "clamp(0px, (100% - 360px + 32px) * 999, 16px)",
+                transition: "transform 0.8s, border 0.8s",
+                "&:hover": {
+                  borderColor: theme.vars.palette.primary.outlinedHoverBorder,
+                  transform: "translateY(-6px)",
+                },
+                "& > *": {
+                  minWidth: "clamp(0px, (360px - 100%) * 999,100%)",
+                },
+              })}
             >
-              {VoteData.map((item, index) => (
-                <Box key={index} sx={{ minHeight: 350, margin: "1rem" }}>
-                  <Card
-                    variant="outlined"
-                    onClick={() => navigateToStat(item._id)}
-                    sx={(theme) => ({
-                      width: 300,
-                      gridColumn: "span 2",
-                      flexDirection: "row",
-                      flexWrap: "wrap",
-                      resize: "horizontal",
-                      overflow: "hidden",
-                      gap: "clamp(0px, (100% - 360px + 32px) * 999, 16px)",
-                      transition: "transform 0.8s, border 0.8s",
-                      "&:hover": {
-                        borderColor:
-                          theme.vars.palette.primary.outlinedHoverBorder,
-                        transform: "translateY(-6px)",
-                      },
-                      "& > *": {
-                        minWidth: "clamp(0px, (360px - 100%) * 999,100%)",
-                      },
-                    })}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                  maxWidth: 200,
+                }}
+              >
+                <Box sx={{ display: "flex" }}>
+                  <div style={{ textAlign: "left" }}>
+                    <Typography level="title-lg">
+                      {VoteData?.img.user.username}
+                    </Typography>
+                    <Typography level="body-sm">{data?.email}</Typography>
+                  </div>
+                  <IconButton
+                    size="sm"
+                    variant="plain"
+                    color="neutral"
+                    sx={{ ml: "auto", alignSelf: "flex-start" }}
                   >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 2,
-                        maxWidth: 200,
-                      }}
-                    >
-                      <Box sx={{ display: "flex" }}>
-                        <div style={{ textAlign: "left" }}>
-                          <Typography level="title-lg">
-                            {item.img.user.username}
-                          </Typography>
-                          <Typography level="body-sm">{data?.email}</Typography>
-                        </div>
-                        <IconButton
-                          size="sm"
-                          variant="plain"
-                          color="neutral"
-                          sx={{ ml: "auto", alignSelf: "flex-start" }}
-                        >
-                          <Typography
-                            level="body-sm"
-                            sx={{ marginRight: "0.5rem" }}
-                          >
-                            {item.point}
-                          </Typography>
-                          <FavoriteBorderRoundedIcon color="danger" />
-                        </IconButton>
-                      </Box>
-                      <AspectRatio
-                        variant="soft"
-                        sx={{
-                          "--AspectRatio-paddingBottom":
-                            "clamp(0px, (100% - 200px) * 999, 200px)",
-                          pointerEvents: "none",
-                        }}
-                      >
-                        <img alt="" src={item.img.img_url} />
-                      </AspectRatio>
-                      <Box sx={{ display: "flex", gap: 1.5, mt: "auto" }}>
-                        <Avatar
-                          variant="soft"
-                          color="neutral"
-                          src={data?.img_url}
-                        ></Avatar>
-                        <div>
-                          <Typography level="body-xs">Designed by</Typography>
-                          <Typography level="body-sm">
-                            {item.img.user.username}
-                          </Typography>
-                        </div>
-                      </Box>
-                      <Box sx={{ flexGrow: 1 }}>
-                        <Button
-                          sx={{
-                            color: "rgba(100, 100, 100, 0.87)",
-                            marginRight: "1rem",
-                          }}
-                          onClick={() => DeleteImage(item.img._id, item._id)}
-                        >
-                          Delete
-                        </Button>
-                        <Button
-                          sx={{
-                            color: "rgba(100, 100, 100, 0.87)",
-                            marginLeft: "1rem",
-                          }}
-                          onClick={() => navigateToEditImage(item.img.img_id)}
-                        >
-                          Edit
-                        </Button>
-                      </Box>
-                    </Box>
-                  </Card>
+                    <Typography level="body-sm" sx={{ marginRight: "0.5rem" }}>
+                      {VoteData?.point}
+                    </Typography>
+                    <FavoriteBorderRoundedIcon color="danger" />
+                  </IconButton>
                 </Box>
-              ))}
-            </Grid>
+                <AspectRatio
+                  variant="soft"
+                  sx={{
+                    "--AspectRatio-paddingBottom":
+                      "clamp(0px, (100% - 200px) * 999, 200px)",
+                    pointerEvents: "none",
+                  }}
+                >
+                  <img alt="" src={VoteData?.img.img_url} />
+                </AspectRatio>
+                <Box sx={{ display: "flex", gap: 1.5, mt: "auto" }}>
+                  <Avatar
+                    variant="soft"
+                    color="neutral"
+                    src={data?.img_url}
+                  ></Avatar>
+                  <div>
+                    <Typography level="body-xs">Designed by</Typography>
+                    <Typography level="body-sm">
+                      {VoteData?.img.user.username}
+                    </Typography>
+                  </div>
+                </Box>
+                <Box sx={{ flexGrow: 1 }}>
+                  <Button
+                    sx={{
+                      color: "rgba(100, 100, 100, 0.87)",
+                      marginRight: "1rem",
+                    }}
+                    onClick={() => DeleteImage(VoteData?.img._id, VoteData._id)}
+                  >
+                    Delete
+                  </Button>
+                  <Button
+                    sx={{
+                      color: "rgba(100, 100, 100, 0.87)",
+                      marginLeft: "1rem",
+                    }}
+                    onClick={() => navigateToEditImage(VoteData?.img.img_id)}
+                  >
+                    Edit
+                  </Button>
+                </Box>
+              </Box>
+            </Card>
+          </Box>
+          <div>
+            <BarChart
+              series={[
+                { data: [35] },
+                { data: [51] },
+                { data: [15] },
+                { data: [60] },
+              ]}
+              height={290}
+              width={300}
+              xAxis={[{ data: ["Q1"], scaleType: "band" }]}
+              margin={{ top: 10, bottom: 30, left: 40, right: 10 }}
+            />
           </div>
         </Box>
       </Container>
@@ -324,4 +317,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default StatPage;

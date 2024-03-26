@@ -5,22 +5,22 @@ import Avatar from "@mui/joy/Avatar";
 import { useNavigate } from "react-router-dom";
 
 function Header({ data, type }) {
-  console.log("from headAdmin "+data);
+  console.log("from headAdmin " + data);
   const navigate = useNavigate();
   function navigateToHome() {
-    navigate("/"+data+"/?type="+type);
+    navigate("/" + data + "/?type=" + type);
   }
   function navigateToRank() {
-    navigate("/rank/"+data+"/?type="+type);
+    navigate("/rank/" + data + "/?type=" + type);
   }
   function navigateToProfile() {
-    navigate("/profile/"+data+"/?type="+type);
+    navigate("/profile/" + data + "/?type=" + type);
   }
   function navigateToAdmin() {
-    navigate("/admin/"+data+"/?type="+type);
+    navigate("/admin/" + data + "/?type=" + type);
   }
   function navigateToListProfile() {
-    navigate("/ListProfile/"+data+"/?type="+type);
+    navigate("/ListProfile/" + data + "/?type=" + type);
   }
   function navigateToLogin() {
     navigate("/login");
@@ -43,26 +43,49 @@ function Header({ data, type }) {
             sx={{ flexGrow: 1 }}
           ></Typography>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          <Button color="inherit"sx={{margin : "0.3rem"}} onClick={navigateToAdmin}>
+            <Button
+              color="inherit"
+              sx={{ margin: "0.3rem" }}
+              onClick={navigateToAdmin}
+            >
               Set Time
             </Button>
-            <Button color="inherit" sx={{margin : "0.3rem"}} onClick={navigateToListProfile}>
+            <Button
+              color="inherit"
+              sx={{ margin: "0.3rem" }}
+              onClick={navigateToListProfile}
+            >
               Users
             </Button>
-            <Button color="inherit"sx={{margin : "0.3rem"}}  onClick={navigateToHome}>
-              Home
+            <Button
+              color="inherit"
+              sx={{ margin: "0.3rem" }}
+              onClick={navigateToHome}
+            >
+              Vote
             </Button>
-            <Button color="inherit"sx={{margin : "0.3rem"}}  onClick={navigateToRank}>
+            <Button
+              color="inherit"
+              sx={{ margin: "0.3rem" }}
+              onClick={navigateToRank}
+            >
               Rank
             </Button>
-            <Button color="inherit"sx={{margin : "0.3rem"}}  onClick={navigateToProfile}>
+            <Button
+              color="inherit"
+              sx={{ margin: "0.3rem" }}
+              onClick={navigateToProfile}
+            >
               Profile
             </Button>
-            <Button color="inherit"sx={{margin : "0.3rem"}}  onClick={navigateToLogin}>
+            <Button
+              color="inherit"
+              sx={{ margin: "0.3rem" }}
+              onClick={navigateToLogin}
+            >
               Logout
             </Button>
           </Typography>
-        
         </Toolbar>
       </AppBar>
     </Box>

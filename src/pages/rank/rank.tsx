@@ -35,17 +35,39 @@ const RankPage = () => {
   }, [params.id]);
 
   async function callApiVote(id: string) {
-    const url2 = `http://localhost:9000/vote/sort`;
+    const url2 = `http://localhost:9000/vote`;
     try {
       const response = await axios.get(url2);
       const vote: Vote[] = response.data;
       const data = vote.data;
-      setVoteData(data);
-      console.log(data);
+      const seen = new Set();
+      const updatedData: Vote[] = [];
+      data.forEach((item) => {
+        const imgId = item.img.img_id;
+        if (!seen.has(imgId)) {
+          seen.add(imgId);
+          updatedData.push(item);
+        } else {
+          const existingIndex = updatedData.findIndex(
+            (existingItem) => existingItem.img.img_id === imgId
+          );
+          if (existingIndex !== -1) {
+            updatedData[existingIndex] = item;
+          }
+        }
+      });
+
+      // เรียงลำดับ updatedData ตามค่า point ของแต่ละอ็อบเจกต์
+      updatedData.sort((a, b) => b.point - a.point);
+
+      console.log("======updatedData=====");
+      console.log(updatedData);
+      setVoteData(updatedData);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
+
   useEffect(() => {
     if (params.id != null) {
       callApi(params.id, type);
@@ -88,7 +110,6 @@ const RankPage = () => {
   }
   console.log(ImageData);
 
-
   return (
     <>
       {params.id != null && type === "0" ? (
@@ -110,7 +131,7 @@ const RankPage = () => {
                 <th style={{ textAlign: "center" }}>Rank</th>
                 <th style={{ width: "40%", textAlign: "center" }}>Image</th>
                 <th style={{ width: "30%", textAlign: "center" }}>
-                Image owner's name
+                  Image owner's name
                 </th>
                 <th style={{ textAlign: "center" }}>Point</th>
               </tr>
@@ -120,27 +141,22 @@ const RankPage = () => {
                 <tbody>
                   <tr>
                     <td>
-                      <h1>{index+1}</h1>
+                      <h1>{index + 1}</h1>
                     </td>
                     <td>
-                    <AspectRatio
-                          variant="soft"
-                          sx={{
-                            "--AspectRatio-paddingBottom":
-                              "clamp(0px, (100% - 200px) * 999, 200px)",
-                            pointerEvents: "none",
-                          }}
-                        >
-                          <img
-                            alt=""
-                            src={VoteData[index].img.img_url}
-                          />
-                        </AspectRatio>
+                      <AspectRatio
+                        variant="soft"
+                        sx={{
+                          "--AspectRatio-paddingBottom":
+                            "clamp(0px, (100% - 200px) * 999, 200px)",
+                          pointerEvents: "none",
+                        }}
+                      >
+                        <img alt="" src={VoteData[index].img.img_url} />
+                      </AspectRatio>
                     </td>
                     <td style={{}}>
-                      <p>
-                      {VoteData[index].img.user.username}
-                      </p>
+                      <p>{VoteData[index].img.user.username}</p>
                     </td>
                     <td>
                       <h2>{VoteData[index].point}</h2>
@@ -157,7 +173,3 @@ const RankPage = () => {
 };
 
 export default RankPage;
-
-
-
-  
