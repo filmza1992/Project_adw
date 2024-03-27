@@ -16,16 +16,23 @@ const LoginUserPage = () => {
       email: emailRef.current?.value,
       password: passwordRef.current?.value,
     };
-    const url = `http://localhost:9000/user/login`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/user/login`;
     const response = await axios.post(url, body);
     const result = response.data;
 
     if (result.message == "Successfuly_Login") {
       console.log("Successfuly_Login");
-      const url = "http://localhost:9000/user/email/"+emailRef.current?.value;
-      const response = await axios.get(url);
-      const users: Users[] = response.data;
-      const user = users.data;
+      const url = "https://542d-118-172-203-210.ngrok-free.app/user/email/"+emailRef.current?.value;
+      const response = await axios.get(url,
+          {
+            headers: {
+              'ngrok-skip-browser-warning': 'true'
+            }
+          }
+        );
+      const user = response.data.data;
+      console.log(data);
+      console.log(user);
       setData(user);
       console.log(user._id);
       navigate("/" + user._id + "?type=0");
@@ -50,7 +57,7 @@ const LoginUserPage = () => {
         }}
       >
         <Box
-          sx={(theme) => ({
+          sx={{
             border: "1px solid rgba(100, 100, 100, 0.87)",
             padding: "4rem",
             borderRadius: "1rem",
@@ -61,7 +68,7 @@ const LoginUserPage = () => {
                 " 0 0 1em rgba(100, 100, 100, 0.87), 0 0 1em rgba(100, 100, 100, 0.87),  0 0 1em rgba(100, 100, 100, 0.87)",
               transform: "translateY(-2px)",
             },
-          })}
+          }}
         >
           <h1>Login</h1>
           <p>Please select your account</p>

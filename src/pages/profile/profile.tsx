@@ -1,4 +1,4 @@
-import { Box, Container, textAlign } from "@mui/system";
+import { Box, Container} from "@mui/system";
 import { useNavigate } from "react-router-dom";
 import { Button, Grid } from "@mui/material";
 import HeaderAdmin from "../../component/headerAdmin";
@@ -10,71 +10,74 @@ import Card from "@mui/joy/Card";
 import CardContent from "@mui/joy/CardContent";
 import Typography from "@mui/joy/Typography";
 import IconButton from "@mui/joy/IconButton";
-import Link from "@mui/joy/Link";
+
 import { useParams, useSearchParams } from "react-router-dom";
-import { Users } from "../../model/users";
+
 import axios from "axios";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import { useEffect, useState } from "react";
-import { Admin } from "../../model/Admin";
-import { Image } from "../../model/Image";
+
 import { Vote } from "../../model/Vote";
-import { User } from "firebase/auth";
-import Alert from "@mui/joy/Alert";
-import WarningIcon from "@mui/icons-material/Warning";
+import { Users } from "../../model/users";
+
 const ProfilePage = () => {
   const params = useParams();
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
-  const [adminData, setAdminData] = useState<Admin[]>([]);
-  const [userData, setUserData] = useState<User[]>([]);
-  const [ImageData, setImageData] = useState<Image[]>([]);
+
   const [VoteData, setVoteData] = useState<Vote[]>([]);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<Users>();
   const navigate = useNavigate(); // ย้ายไปข้างบน
+
+  const headers = {
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  };
   useEffect(() => {
     if (params.id != null) {
-      callApi(params.id, type);
+      callApi(params.id, type || "");
     }
   }, [params.id]);
 
   async function callApi(id: string, type: string) {
     if (type == "1") {
-      const url = `http://localhost:9000/admin/${id}`;
+      
+      const url = `https://542d-118-172-203-210.ngrok-free.app/admin/${id}`;
       try {
-        const response = await axios.get(url);
-        const admin: Admin[] = response.data;
-        const data = admin.data;
-        setAdminData(data);
-        setData(data);
+        const response = await axios.get(url,headers);
+        const userData = response.data.data;
+
+        setData(userData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     } else {
-      const url = `http://localhost:9000/user/${id}`;
+      console.log(id);
+      const url = `https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
       try {
-        const response = await axios.get(url);
-        const users: User[] = response.data;
-        const data = users.data;
-        setUserData(data);
-        setData(data);
+        const response = await axios.get(url,headers);
+        const userData = response.data.data;
+
+        setData(userData);
+        console.log(userData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-      const url1 = `http://localhost:9000/image/user/${id}`;
+      const url1 = `https://542d-118-172-203-210.ngrok-free.app/image/user/${id}`;
       try {
-        const response = await axios.get(url1);
-        const imagepost: Image[] = response.data;
-        const data = imagepost.data;
-        setImageData(data);
+        const response = await axios.get(url1,headers);
+        const data = response.data.data;
+        console.log(data);
+     
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-      const url2 = `http://localhost:9000/vote/user/${id}`;
+      const url2 = `https://542d-118-172-203-210.ngrok-free.app/vote/user/${id}`;
       try {
-        const response = await axios.get(url2);
-        const vote: Vote[] = response.data;
-        const data = vote.data;
+        const response = await axios.get(url2,headers);
+        const vote: Vote[] = response.data.data;
+        const data = vote;
         setVoteData(data);
         console.log(data);
       } catch (error) {
@@ -90,21 +93,21 @@ const ProfilePage = () => {
         "/?type=" +
         type +
         "&name=" +
-        data.username +
+        data?.username +
         "&phone=" +
-        data.phone +
+        data?.phone +
         "&birthday=" +
-        data.birth_day
+        data?.birth_day
     ); // ใส่เช็คว่า data ไม่ใช่ null ก่อนที่จะเรียกใช้
   }
   async function DeleteImage(id: string, idvote: string) {
-    const url = `http://localhost:9000/image/${id}`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/image/${id}`;
     try {
       await axios.delete(url);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-    const url2 = `http://localhost:9000/vote/${idvote}`;
+    const url2 = `https://542d-118-172-203-210.ngrok-free.app/vote/${idvote}`;
     try {
       await axios.delete(url2);
       window.location.reload();
@@ -266,7 +269,7 @@ const ProfilePage = () => {
                           >
                             {item.point}
                           </Typography>
-                          <FavoriteBorderRoundedIcon color="danger" />
+                          <FavoriteBorderRoundedIcon />
                         </IconButton>
                       </Box>
                       <AspectRatio
@@ -298,7 +301,7 @@ const ProfilePage = () => {
                             color: "rgba(100, 100, 100, 0.87)",
                             marginRight: "1rem",
                           }}
-                          onClick={() => DeleteImage(item.img._id, item._id)}
+                          onClick={() => DeleteImage(item.img.img_id, item._id)}
                         >
                           Delete
                         </Button>

@@ -23,7 +23,7 @@ const ChooseLoginPage = () => {
         }}
       >
         <Box
-          sx={(theme) => ({
+          sx={{
             border: "1px solid rgba(100, 100, 100, 0.87)",
             padding: "4rem",
             borderRadius: "1rem",
@@ -34,7 +34,7 @@ const ChooseLoginPage = () => {
                 " 0 0 1em rgba(100, 100, 100, 0.87), 0 0 1em rgba(100, 100, 100, 0.87),  0 0 1em rgba(100, 100, 100, 0.87)",
               transform: "translateY(-2px)",
             },
-          })}
+          }}
         >
           <h1>Login</h1>
           <br />

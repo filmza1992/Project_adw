@@ -1,6 +1,5 @@
-import { Box, Container, textAlign } from "@mui/system";
-import { useNavigate } from "react-router-dom";
-import { Button, Grid } from "@mui/material";
+import { Box, Container} from "@mui/system";
+import {  Grid } from "@mui/material";
 import HeaderAdmin from "../../component/headerAdmin";
 import HeaderUser from "../../component/headerUser";
 import Header from "../../component/header";
@@ -10,50 +9,52 @@ import Card from "@mui/joy/Card";
 import CardContent from "@mui/joy/CardContent";
 import Typography from "@mui/joy/Typography";
 import IconButton from "@mui/joy/IconButton";
-import Link from "@mui/joy/Link";
+
 import { useParams, useSearchParams } from "react-router-dom";
-import { Users } from "../../model/users";
+
 import axios from "axios";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import { useEffect, useState } from "react";
-import { Admin } from "../../model/Admin";
 import { Image } from "../../model/Image";
-import { User } from "firebase/auth";
+import { Users } from "../../model/users";
 
 const ShowProfilePage = () => {
   const params = useParams();
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
   const showid = searchParams.get("showid");
-  const [adminData, setAdminData] = useState<Admin[]>([]);
-  const [userData, setUserData] = useState<User[]>([]);
   const [ImageData, setImageData] = useState<Image[]>([]);
-  const [data, setData] = useState<any>(null);
-  const navigate = useNavigate(); // ย้ายไปข้างบน
+  const [data, setData] = useState<Users>();
+
+  
+  const headers = {
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  };
 
   useEffect(() => {
     if (showid != null) {
-      callApi(showid, type);
+      callApi(showid);
     }
   }, [showid]);
 
-  async function callApi(id: string, type: string) {
+  async function callApi(id: string) {
     
-      const url = `http://localhost:9000/user/${id}`;
+      const url = `https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
       try {
-        const response = await axios.get(url);
-        const users: User[] = response.data;
-        const data = users.data;
-        setUserData(data);
+        const response = await axios.get(url,headers);
+        const users = response.data.data;
+        const data = users;
         setData(data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-      const url1 = `http://localhost:9000/image/user/${id}`;
+      const url1 = `https://542d-118-172-203-210.ngrok-free.app/image/user/${id}`;
       try {
-        const response = await axios.get(url1);
-        const imagepost: image[] = response.data;
-        const data = imagepost.data;
+        const response = await axios.get(url1,headers);
+        const imagepost: Image[] = response.data.data;
+        const data = imagepost;
         setImageData(data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -132,7 +133,7 @@ const ShowProfilePage = () => {
               columns={{ xs: 4, sm: 8, md: 12 }}
               sx={{ flexGrow: 1 ,marginLeft : "2.5rem"}}
             >
-              {ImageData.map((item, index)  => {
+              {ImageData.map((item)  => {
                 return (
                   <Box sx={{ minHeight: 350, margin: "1rem" }}>
                     <Card
@@ -179,7 +180,7 @@ const ShowProfilePage = () => {
                             color="neutral"
                             sx={{ ml: "auto", alignSelf: "flex-start" }}
                           >
-                            <FavoriteBorderRoundedIcon color="danger" />
+                            <FavoriteBorderRoundedIcon />
                           </IconButton>
                         </Box>
                         <AspectRatio
@@ -192,7 +193,7 @@ const ShowProfilePage = () => {
                         >
                           <img
                             alt=""
-                            src={ImageData[index].img_url}
+                            src={item.img_url}
                           />
                         </AspectRatio>
                         <Box sx={{ display: "flex", gap: 1.5, mt: "auto" }}>
@@ -204,7 +205,7 @@ const ShowProfilePage = () => {
                           <div>
                             <Typography level="body-xs">Designed by</Typography>
                             <Typography level="body-sm">
-                              {data.username}
+                              {data?.username}
                             </Typography>
                           </div>
                         </Box>

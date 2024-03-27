@@ -1,12 +1,12 @@
+
 import { Box, Container } from "@mui/system";
 import TextField from "@mui/material/TextField";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import HeaderUser from "../../component/headerUser";
 import HeaderAdmin from "../../component/headerAdmin";
 import Header from "../../component/header";
-import { getDownloadURL, listAll, ref, uploadBytes } from "firebase/storage";
-import { useEffect, useRef, useState } from "react";
-import { Admin } from "../../model/Admin";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { useEffect, useState } from "react";
 import { Vote } from "../../model/Vote";
 import axios from "axios";
 import { Button } from "@mui/material";
@@ -15,41 +15,52 @@ import { imgDB } from "../image/config";
 import { Users } from "../../model/users";
 import { Image } from "../../model/Image";
 const ChangeImgPage = () => {
-  const [img, setImg] = useState();
-  const [imgUrl, setImgUrl] = useState([]);
-  const [imgUrlTmp, setImgUrlTmp] = useState();
+  const [img, setImg] = useState<File>();
+
+  const [imgUrlTmp, setImgUrlTmp] = useState<string>();
   const params = useParams();
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
   const img_id = searchParams.get("img_id");
   const navigate = useNavigate(); // ย้ายไปข้างบน
   const [userData, setUserData] = useState<Users[]>([]);
-  const [ImageData, setImageData] = useState<Image[]>([]);
   const [VoteData, setVoteData] = useState<Vote[]>([]);
+
+  const headers = {
+    headers: {
+      "ngrok-skip-browser-warning": "true",
+    },
+  };
   // console.log(img_id);
   useEffect(() => {
     if (params.id != null) {
-      callApi(params.id, type);
+      callApi(params.id);
+    }
+    if (imgUrlTmp) {
+      console.log("index ==== : " + imgUrlTmp);
+      upPost();
+      // ทำงานเมื่อมีรูปที่อัปโหลดเสร็จแล้ว
+      // สามารถเรียกใช้โค้ดที่ต้องการทำงานต่อไปได้ที่นี่
     }
   }, [params.id]);
 
-  async function callApi(id: string, type: string) {
-    const url = `http://localhost:9000/user/${id}`;
+  async function callApi(id: string) {
+    const url = `http://https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
     try {
-      const response = await axios.get(url);
-      const users: Users[] = response.data;
-      const data = users.data;
+      const response = await axios.get(url, headers);
+      const users = response.data.data;
+      const data = users;
       setUserData(data);
       console.log("users data");
       console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-    const urlvote = `http://localhost:9000/vote/image/${img_id}`;
+    const urlvote = `http://https://542d-118-172-203-210.ngrok-free.app/vote/image/${img_id}`;
     try {
-      const response = await axios.get(urlvote);
+      const response = await axios.get(urlvote, headers);
       const vote: Vote[] = response.data;
-      const data = vote.data;
+      const data = vote;
       setVoteData(data);
       console.log("vote data");
       console.log(data);
@@ -69,57 +80,17 @@ const ChangeImgPage = () => {
     }
   }
 
-  useEffect(() => {
-    // console.log(88);
-    listAll(ref(imgDB, "files")).then((imgs) => {
-      const promises = imgs.items.map((item) => getDownloadURL(item));
-      Promise.all(promises).then((urls) => {
-        setImgUrl(urls);
-        // console.log("All images are loaded"); // ตรวจสอบว่ารูปภาพทั้งหมดถูกโหลดเสร็จแล้ว
-      });
-    });
-  }, []);
-
-  useEffect(() => {
-    // console.log(88);
-    listAll(ref(imgDB, "files")).then((imgs) => {
-      imgs.items.forEach((val) => {
-        // console.log(val.name);
-        getDownloadURL(val).then((url) => {
-          setImgUrl((data) => [...data, url]);
-        });
-      });
-    });
-  }, []);
-
-  useEffect(() => {
-    console.log(88);
-    listAll(ref(imgDB, "files")).then((imgs) => {
-      const promises = imgs.items.map((item) => getDownloadURL(item));
-      Promise.all(promises).then((urls) => {
-        setImgUrl(urls);
-        console.log("All images are loaded");
-        // ตรวจสอบว่ามีรูปที่อัปโหลดเสร็จแล้วหรือไม่
-        if (imgUrlTmp) {
-          console.log("index ==== : " + imgUrlTmp);
-          upPost();
-          // ทำงานเมื่อมีรูปที่อัปโหลดเสร็จแล้ว
-          // สามารถเรียกใช้โค้ดที่ต้องการทำงานต่อไปได้ที่นี่
-        }
-      });
-    });
-  }, [imgUrlTmp]);
 
   async function upPost() {
     const body = {
       img_url: imgUrlTmp,
       user: {
         user_id: params.id,
-        username: userData.username,
-        photoURL: userData.img_url,
+        username: userData[0].username,
+        photoURL: userData[0].img_url,
       },
     };
-    const url = `http://localhost:9000/image/${img_id}`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/image/${img_id}`;
     try {
       const response = await axios.put(url, body);
       const result = response.data;
@@ -137,20 +108,19 @@ const ChangeImgPage = () => {
   }
 
   async function callmage() {
-    const urlimage = `http://localhost:9000/image/${img_id}`;
+    const urlimage = `https://542d-118-172-203-210.ngrok-free.app/image/${img_id}`;
     try {
-      const response = await axios.get(urlimage);
-      const image: Image[] = response.data;
-      const data = image.data;
-      setImageData(data);
-      console.log(data._id);
-      upVote(data._id);
+      const response = await axios.get(urlimage, headers);
+      const image: Image[] = response.data.data;
+      const data = image;
+      console.log(data[0]._id);
+      upVote();
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
 
-  async function upVote(_id: string) {
+  async function upVote() {
     console.log("data img");
     console.log(VoteData);
     const body = {
@@ -160,14 +130,14 @@ const ChangeImgPage = () => {
         img_url: imgUrlTmp, // กำหนด img_url ตามที่ต้องการ
         user: {
           user_id: params.id, // กำหนด user_id ตามที่ต้องการ
-          username: userData.username, // กำหนด username ตามที่ต้องการ
-          photoURL: userData.img_url, // กำหนด photoURL ตามที่ต้องการ
+          username: userData[0].username, // กำหนด username ตามที่ต้องการ
+          photoURL: userData[0].img_url, // กำหนด photoURL ตามที่ต้องการ
         },
       },
       create_at: new Date(),
     };
 
-    const url = `http://localhost:9000/vote/${VoteData[0]._id}`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/vote/${VoteData[0]._id}`;
     const response = await axios.put(url, body);
     const result = response.data;
     console.log(result.message);
@@ -211,8 +181,12 @@ const ChangeImgPage = () => {
               <form>
                 <TextField
                   type="file"
-                  onChange={(e) => setImg(e.target.files[0])}
-                />
+                  onChange={(e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    console.log(file);
+                    return setImg(file);
+                  }}
+                ></TextField>
                 <Button
                   style={{ marginLeft: "1rem", marginTop: "0.5rem" }}
                   variant="contained"

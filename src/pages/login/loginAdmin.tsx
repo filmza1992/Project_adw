@@ -2,7 +2,7 @@ import { Box, Container } from "@mui/system";
 import TextField from "@mui/material/TextField";
 // import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { Alert, Button } from "@mui/material";
+import { Button } from "@mui/material";
 import Header from "../../component/header";
 import axios from "axios";
 import { Users } from "../../model/users";
@@ -10,23 +10,29 @@ import { useRef, useState } from "react";
 const LoginAdminPage = () => {
   const emailRef = useRef<HTMLInputElement>();
   const passwordRef = useRef<HTMLInputElement>();
-  const [data, setData] = useState<Users[]>([]);
+  const [data, setData] = useState<Users>();
   async function navigateToHome() {
     const body = {
       email: emailRef.current?.value,
       password: passwordRef.current?.value,
     };
-    const url = `http://localhost:9000/user/login`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/user/login`;
     const response = await axios.post(url, body);
     const result = response.data;
 
+    const headers = {
+      headers: {
+        'ngrok-skip-browser-warning': 'true'
+      }
+    };
     if (result.message == "Successfuly_Login_Admin") {
       console.log("Successfuly_Login");
-      const url = "http://localhost:9000/admin/email/"+emailRef.current?.value;
-      const response = await axios.get(url);
-      const users: Users[] = response.data;
-      const user = users.data;
+      const url = "https://542d-118-172-203-210.ngrok-free.app/admin/email/"+emailRef.current?.value;
+      const response = await axios.get(url,headers);
+      const users: Users = response.data.data;
+      const user = users;
       setData(user);
+      console.log(data);
       console.log(user._id);
       navigate("/" + user._id + "?type=1");
     } else {
@@ -47,7 +53,7 @@ const LoginAdminPage = () => {
         }}
       >
         <Box
-          sx={(theme) => ({
+          sx={{
             border: "1px solid rgba(100, 100, 100, 0.87)",
             padding: "4rem",
             borderRadius: "1rem",
@@ -58,7 +64,7 @@ const LoginAdminPage = () => {
                 " 0 0 1em rgba(100, 100, 100, 0.87), 0 0 1em rgba(100, 100, 100, 0.87),  0 0 1em rgba(100, 100, 100, 0.87)",
               transform: "translateY(-2px)",
             },
-          })}
+          }}
         >
           <h1>Admin Login</h1>
           <p>Please select your account</p>

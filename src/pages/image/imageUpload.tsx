@@ -14,31 +14,40 @@ import HeaderAdmin from "../../component/headerAdmin";
 import axios from "axios";
 import { Users } from "../../model/users";
 import { Image } from "../../model/Image";
-import CloseIcon from "@mui/icons-material/Close";
-import IconButton from "@mui/joy/IconButton";
 import Alert from "@mui/joy/Alert";
-function imageUpLoadPage() {
-  const [img, setImg] = useState();
-  const [imgUrl, setImgUrl] = useState([]);
-  const [imgUrlTmp, setImgUrlTmp] = useState();
+function ImageUpLoadPage() {
+  const [img, setImg] = useState<File>();
+  const [imgUrl, setImgUrl] = useState<string[]>([]);
+  const [imgUrlTmp, setImgUrlTmp] = useState<string>();
   const params = useParams();
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
   const navigate = useNavigate(); // ย้ายไปข้างบน
-  const [userData, setUserData] = useState<Users[]>([]);
+  const [userData, setUserData] = useState<Users>();
   const [ImageData, setImageData] = useState<Image[]>([]);
+
+  const headers = {
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  };
+
   useEffect(() => {
     if (params.id != null) {
-      callApi(params.id, type);
+      callApi(params.id);
     }
   }, [params.id]);
 
-  async function callApi(id: string, type: string) {
-    const url = `http://localhost:9000/user/${id}`;
+  async function callApi(id: string) {
+    const url = `https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
+    console.log(imgUrl);
+    console.log(ImageData);
     try {
-      const response = await axios.get(url);
-      const users: User[] = response.data;
-      const data = users.data;
+      const response = await axios.get(url,headers);
+      console.log(response);
+      const users = response.data.data;
+      const data = users;
+      console.log(data);
       setUserData(data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -49,7 +58,7 @@ function imageUpLoadPage() {
       const imgRef = ref(imgDB, `files/${v4()}`);
       uploadBytes(imgRef, img).then((val) => {
         getDownloadURL(val.ref).then((url) => {
-          setImgUrlTmp(url);
+          return setImgUrlTmp(url);
           // console.log("url : " + url);
         });
       });
@@ -106,7 +115,7 @@ function imageUpLoadPage() {
         photoURL: userData.img_url,
       },
     };
-    const url = `http://localhost:9000/image`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/image`;
     try {
       const response = await axios.post(url, body);
       const result = response.data;
@@ -124,11 +133,11 @@ function imageUpLoadPage() {
   }
 
   async function callmage() {
-    const urlimage = `http://localhost:9000/image`;
+    const urlimage = `https://542d-118-172-203-210.ngrok-free.app/user/image`;
     try {
       const response = await axios.get(urlimage);
       const image: Image[] = response.data;
-      const data = image.data;
+      const data = image;
       setImageData(data);
       console.log(data[data.length - 1]._id);
       upVote(data[data.length - 1]._id);
@@ -153,7 +162,7 @@ function imageUpLoadPage() {
       },
       create_at: new Date(),
     };
-    const url = `http://localhost:9000/vote`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/user/vote`;
     const response = await axios.post(url, body);
     const result = response.data;
     console.log(result.message);
@@ -185,7 +194,8 @@ function imageUpLoadPage() {
         }}
       >
         <Box
-          sx={(theme) => ({
+          sx={{
+
             border: "1px solid rgba(100, 100, 100, 0.87)",
             padding: "4rem",
             borderRadius: "1rem",
@@ -193,18 +203,23 @@ function imageUpLoadPage() {
             transitionDuration: "0.7s",
             "&:hover": {
               boxShadow:
-                " 0 0 1em rgba(100, 100, 100, 0.87), 0 0 1em rgba(100, 100, 100, 0.87),  0 0 1em rgba(100, 100, 100, 0.87)",
+              " 0 0 1em rgba(100, 100, 100, 0.87), 0 0 1em rgba(100, 100, 100, 0.87),  0 0 1em rgba(100, 100, 100, 0.87)",
               transform: "translateY(-2px)",
-            },
-          })}
+              
+            }}
+          }
         >
           <h1>Upload picture</h1>
           <p>Please select your flie</p>
           <br />
           <TextField
-            type="file"
-            onChange={(e) => setImg(e.target.files[0])}
-          ></TextField>
+                  type="file"
+                  onChange={(e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    console.log(file);
+                    return setImg(file);
+                  }}
+                ></TextField>
 
           <br />
           <Button
@@ -222,4 +237,4 @@ function imageUpLoadPage() {
     </>
   );
 }
-export default imageUpLoadPage;
+export default ImageUpLoadPage;

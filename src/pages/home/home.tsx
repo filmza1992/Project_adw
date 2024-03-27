@@ -7,16 +7,13 @@ import { Avatar } from "@mui/joy"; // Import Avatar from "@mui/joy" instead of "
 import { Typography, IconButton, Button, Toolbar } from "@mui/material";
 import Card from "@mui/joy/Card";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Users } from "../../model/users";
 import axios from "axios";
 import { Vote } from "../../model/Vote";
 import { TimeSet } from "../../model/TimeSet";
 import { useState, useEffect } from "react";
 import Dialog, { DialogProps } from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import AspectRatio from "@mui/joy/AspectRatio";
@@ -24,7 +21,7 @@ import React from "react";
 import { Image } from "../../model/Image";
 function HomePage() {
   const params = useParams();
-  const [userData, setUserData] = useState<Users[]>([]);
+
   const [ImageData, setImageData] = useState<Image[]>([]);
   const [VoteData, setVoteData] = useState<Vote[]>([]);
   const [TimeSetData, setTimeSetData] = useState<TimeSet[]>([]);
@@ -34,6 +31,12 @@ function HomePage() {
   const type = searchParams.get("type");
   const navigate = useNavigate(); // ย้ายไปข้างบน
 
+  const headers = {
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  };
+
   async function delay(ms: number) {
     return await new Promise((resolve) => setTimeout(resolve, ms));
   }
@@ -41,8 +44,7 @@ function HomePage() {
   useEffect(() => {
     if (params.id == null) {
       callApiTimeSet();
-    } else {
-    }
+    } 
   }, [params.id]);
 
   useEffect(() => {
@@ -50,28 +52,30 @@ function HomePage() {
       const loadDataAsync = async () => {
         await delay(TimeSetData[0]?.time_set * 1000);
         setIsLoadingData(false);
-        callApiVote(params.id);
+        console.log(isLoadingData);
+        callApiVote();
       };
       loadDataAsync();
     }
   }, [TimeSetData, params.id]);
 
-  async function callApiVote(id: string) {
-    const url2 = `http://localhost:9000/vote`;
+  async function callApiVote() {
+    const url2 = `https://542d-118-172-203-210.ngrok-free.app/vote`;
     try {
-      const response = await axios.get(url2);
-      const vote: Vote[] = response.data;
-      const data = vote.data;
+      const response = await axios.get(url2,headers);
+      const vote: Vote[] = response.data.data;
+      const data = vote;
       setVoteData(data);
+      console.log(VoteData);
       // console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-    const url3 = `http://localhost:9000/image`;
+    const url3 = `https://542d-118-172-203-210.ngrok-free.app/image`;
     try {
-      const response = await axios.get(url3);
-      const image: Image[] = response.data;
-      const data = image.data;
+      const response = await axios.get(url3,headers);
+      const image: Image[] = response.data.data;
+      const data = image;
       setImageData(data);
       console.log(data);
     } catch (error) {
@@ -88,43 +92,20 @@ function HomePage() {
       const loadDataAsync = async () => {
         await delay(TimeSetData[0]?.time_set * 1000);
         setIsLoadingData(false);
-        callApiVote(params.id);
+        callApiVote();
       };
       loadDataAsync();
     }
   }, [TimeSetData, params.id]);
   async function callApiTimeSet() {
-    const url2 = `http://localhost:9000/timeset`;
+    const url2 = `https://542d-118-172-203-210.ngrok-free.app/timeset`;
     try {
-      const response = await axios.get(url2);
-      const timeset: TimeSet[] = response.data;
-      const data = timeset.data;
+      const response = await axios.get(url2,headers);
+      const timeset: TimeSet[] = response.data.data;
+      const data = timeset;
       setTimeSetData(data);
       console.log("====dataTimeSet====");
       console.log(data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }
-  async function callApi(id: string) {
-    const url = `http://localhost:9000/user/${id}`;
-    try {
-      const response = await axios.get(url);
-      const users: Users[] = response.data;
-      const data = users.data;
-      setUserData(data);
-      // console.log(data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-    const url2 = `http://localhost:9000/vote`;
-    try {
-      const response = await axios.get(url2);
-      const vote: Vote[] = response.data;
-      const data = vote.data;
-
-      setVoteData(data);
-      // console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -141,6 +122,7 @@ function HomePage() {
     if (ImageData.length > 0) {
       selectRandomPlayers(); // คำสั่งนี้
       setIsLoading(false);
+      console.log(isLoading);
     }
   }, [ImageData]);
 
@@ -172,11 +154,11 @@ function HomePage() {
     console.log(
       "=========== callApiVoteForplayer1(playerscall[0]?._id); =======" + id
     );
-    const url = `http://localhost:9000/vote/image/${id}`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/vote/image/${id}`;
     try {
-      const response = await axios.get(url);
-      const vote: Vote[] = response.data;
-      const data = vote.data;
+      const response = await axios.get(url,headers);
+      const vote: Vote[] = response.data.data;
+      const data = vote;
       setVotep1Data(data);
       console.log(data);
     } catch (error) {
@@ -187,22 +169,22 @@ function HomePage() {
     console.log(
       "=========== callApiVoteForplayer1(playerscall[0]?._id); =======" + id
     );
-    const url = `http://localhost:9000/vote/image/${id}`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/vote/image/${id}`;
     try {
-      const response = await axios.get(url);
-      const vote: Vote[] = response.data;
-      const data = vote.data;
+      const response = await axios.get(url,headers);
+      const vote: Vote[] = response.data.data;
+      const data = vote;
       setVotep2Data(data);
       console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
-  let lastItem1: unknown;
+  let lastItem1: Vote;
   if (Votep1Data.length > 0) {
     lastItem1 = Votep1Data[Votep1Data.length - 1];
   }
-  let lastItem2: unknown;
+  let lastItem2: Vote;
   if (Votep2Data.length > 0) {
     lastItem2 = Votep2Data[Votep2Data.length - 1];
   }
@@ -293,7 +275,7 @@ function HomePage() {
   const [open, setOpen] = React.useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("lg"));
-  const [maxWidth, setMaxWidth] = React.useState<DialogProps["maxWidth"]>("md");
+  const [maxWidth] = React.useState<DialogProps["maxWidth"]>("md");
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -314,23 +296,23 @@ function HomePage() {
     }
     try {
       const responseWinner = await axios.get(
-        `http://localhost:9000/vote/${winnerId}`
+        `https://542d-118-172-203-210.ngrok-free.app/vote/${winnerId}`,headers
       );
-      const winnerData: Vote[] = responseWinner.data.data;
+      const winnerData: Vote = responseWinner.data.data;
 
       await upPointWin(winnerData, pointWinner);
 
       const responseLoser = await axios.get(
-        `http://localhost:9000/vote/${loserId}`
+        `https://542d-118-172-203-210.ngrok-free.app/vote/${loserId}`,headers
       );
-      const loserData: Vote[] = responseLoser.data.data;
+      const loserData: Vote = responseLoser.data.data;
 
       await upPointLoss(loserData, pointLoss);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   }
-  async function upPointWin(voteData: Vote[], pointWinner: number) {
+  async function upPointWin(voteData: Vote, pointWinner: number) {
     const bodywinner = {
       point: pointWinner, // ตั้งค่า point ตามที่ต้องการ
       img: {
@@ -344,7 +326,7 @@ function HomePage() {
       },
       create_at: new Date(),
     };
-    const urlwinner = `http://localhost:9000/vote`;
+    const urlwinner = `https://542d-118-172-203-210.ngrok-free.app/vote`;
     const responsewinner = await axios.post(urlwinner, bodywinner);
     const resultwinner = responsewinner.data;
     console.log(resultwinner.message);
@@ -355,7 +337,7 @@ function HomePage() {
       console.log("created Vote not successfully");
     }
   }
-  async function upPointLoss(voteData: Vote[], pointLoss: number) {
+  async function upPointLoss(voteData: Vote, pointLoss: number) {
     const bodyloser = {
       point: pointLoss, // ตั้งค่า point ตามที่ต้องการ
       img: {
@@ -369,7 +351,7 @@ function HomePage() {
       },
       create_at: new Date(),
     };
-    const urlloser = `http://localhost:9000/vote`;
+    const urlloser = `https://542d-118-172-203-210.ngrok-free.app/vote`;
     const responseloser = await axios.post(urlloser, bodyloser);
     const resultloser = responseloser.data;
     console.log(resultloser.message);
@@ -381,25 +363,25 @@ function HomePage() {
       console.log("created Vote not successfully");
     }
   }
-  const CountdownTimer = ({ onComplete }) => {
-    const [count, setCount] = useState(TimeSetData[0]?.time_set);
+  // const CountdownTimer = ({ onComplete }) => {
+  //   const [count, setCount] = useState(TimeSetData[0]?.time_set);
 
-    useEffect(() => {
-      const intervalId = setInterval(() => {
-        setCount((prevCount) => prevCount - 1);
-      }, 1000);
+  //   useEffect(() => {
+  //     const intervalId = setInterval(() => {
+  //       setCount((prevCount) => prevCount - 1);
+  //     }, 1000);
 
-      return () => clearInterval(intervalId);
-    }, []);
+  //     return () => clearInterval(intervalId);
+  //   }, []);
 
-    useEffect(() => {
-      if (count === 0) {
-        onComplete();
-      }
-    }, [count, onComplete]);
+  //   useEffect(() => {
+  //     if (count === 0) {
+  //       onComplete();
+  //     }
+  //   }, [count, onComplete]);
 
-    return <div>{count}</div>;
-  };
+  //   return <div>{count}</div>;
+  // };
   function navigateToShowProfile(id: string) {
     navigate("/ShowProfile/" + params.id + "/?type=" + type + "&showid=" + id);
   }
@@ -484,8 +466,7 @@ function HomePage() {
 
                     <IconButton
                       size="small"
-                      variant="plain"
-                      color="neutral"
+                      color="primary"
                       sx={{ ml: "auto", alignSelf: "flex-start" }}
                     >
                       <FavoriteBorderRoundedIcon />
@@ -576,8 +557,7 @@ function HomePage() {
 
                     <IconButton
                       size="small"
-                      variant="plain"
-                      color="neutral"
+                      color="primary"
                       sx={{ ml: "auto", alignSelf: "flex-start" }}
                     >
                       <FavoriteBorderRoundedIcon />

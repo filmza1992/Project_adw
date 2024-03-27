@@ -11,9 +11,14 @@ import { useEffect } from "react";
 import { v4 } from "uuid";
 import { imgDB } from "../image/config";
 const SignInPage = () => {
-  const [img, setImg] = useState();
+  const [img, setImg] = useState<File>();
   const [imgUrl, setImgUrl] = useState([]);
-  const [imgUrlTmp, setImgUrlTmp] = useState();
+  const [imgUrlTmp, setImgUrlTmp] = useState<string>();
+  const headers = {
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  };
   // function handleClick() {
   //   if (img != null) {
   //     const imgRef = ref(imgDB, `files/${v4()}`);
@@ -55,7 +60,7 @@ const SignInPage = () => {
       Promise.all(promises).then((urls) => {
         setImgUrl(urls);
         console.log("All images are loaded");
-  
+        console.log(data);
         // ตรวจสอบว่ามีรูปที่อัปโหลดเสร็จแล้วหรือไม่
         if (imgUrlTmp) {
           console.log("index ==== : " + imgUrlTmp);
@@ -68,7 +73,6 @@ const SignInPage = () => {
   }, [imgUrlTmp]);
 
   console.log("url imgUrlTmp  +++++++++ : " + imgUrlTmp);
-  const imageRef = useRef<HTMLInputElement>();
   const usernameRef = useRef<HTMLInputElement>();
   const phoneRef = useRef<HTMLInputElement>();
   const emailRef = useRef<HTMLInputElement>();
@@ -76,7 +80,7 @@ const SignInPage = () => {
   const password1Ref = useRef<HTMLInputElement>();
   const password2Ref = useRef<HTMLInputElement>();
   const navigate = useNavigate();
-  const [data, setData] = useState<Users[]>([]);
+  const [data, setData] = useState<Users>();
 
 
   async function navigateToUploadProfile() {
@@ -107,18 +111,18 @@ const SignInPage = () => {
       password: password1Ref.current?.value,
       birth_day: birth_dayRef.current?.value,
     };
-    const url = `http://localhost:9000/user`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/user`;
     const response = await axios.post(url, body);
     const result = response.data;
     console.log(result.message);
     if (result.message == "created user successfully") {
       console.log("created user successfully");
       const url =
-        "http://localhost:9000/user/email/" + emailRef.current?.value;
+        "https://542d-118-172-203-210.ngrok-free.app/user/email/" + emailRef.current?.value;
       console.log(url);
-      const response = await axios.get(url);
-      const users: Users[] = response.data;
-      const user = users.data;
+      const response = await axios.get(url,headers);
+      const users: Users = response.data.data;
+      const user = users;
       setData(user);
       console.log(user);
       console.log(user._id);
@@ -139,7 +143,7 @@ const SignInPage = () => {
         }}
       >
         <Box
-          sx={(theme) => ({
+          sx={{
             border: "1px solid rgba(100, 100, 100, 0.87)",
             marginTop: "1rem",
             padding: "1.2rem",
@@ -152,7 +156,7 @@ const SignInPage = () => {
                 " 0 0 1em rgba(100, 100, 100, 0.87), 0 0 1em rgba(100, 100, 100, 0.87),  0 0 1em rgba(100, 100, 100, 0.87)",
               transform: "translateY(-2px)",
             },
-          })}
+          }}
         >
           <h1>Sign in</h1>
           <br />
@@ -169,9 +173,13 @@ const SignInPage = () => {
           />
           {/* {imgUrl} */}
           <TextField
-            type="file"
-            onChange={(e) => setImg(e.target.files[0])}
-          ></TextField>
+                  type="file"
+                  onChange={(e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    console.log(file);
+                    return setImg(file);
+                  }}
+                ></TextField>
           {/* <Button
             variant="contained"
             sx={{ marginTop: "0.5rem", marginLeft: "1rem" }}

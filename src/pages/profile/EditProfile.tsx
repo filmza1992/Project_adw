@@ -1,20 +1,13 @@
 import { Box, Container } from "@mui/system";
 import TextField from "@mui/material/TextField";
-import styled from "styled-components";
+
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import Header from "../../component/headerUser";
-import CardProfile from "../../component/cardProfile";
 
-import AspectRatio from "@mui/joy/AspectRatio";
-import Link from "@mui/joy/Link";
-import Card from "@mui/joy/Card";
-import CardContent from "@mui/joy/CardContent";
-import Chip from "@mui/joy/Chip";
-import Typography from "@mui/joy/Typography";
+
 import { useEffect, useRef, useState } from "react";
 import { Users } from "../../model/users";
-import { Admin } from "../../model/Admin";
 import axios from "axios";
 import { Button } from "@mui/material";
 import HeaderUser from "../../component/headerUser";
@@ -25,11 +18,10 @@ import HeaderAdmin from "../../component/headerAdmin";
 // import { initializeApp } from "firebase/app";
 // import { getStorage } from "firebase/storage";
 
+
 const EditProfilePage = () => {
-  const imageRef = useRef<HTMLInputElement>();
   const usernameRef = useRef<HTMLInputElement>();
   const phoneRef = useRef<HTMLInputElement>();
-  const emailRef = useRef<HTMLInputElement>();
   const birth_dayRef = useRef<HTMLInputElement>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -37,13 +29,18 @@ const EditProfilePage = () => {
   const name = searchParams.get("name");
   const birth_day = searchParams.get("birthday");
   const phone = searchParams.get("phone");
-  const [adminData, setAdminData] = useState<Admin[]>([]);
-  const [userData, setUserData] = useState<User[]>([]);
-  const [data, setData] = useState<any>(null);
+
+  const [data, setData] = useState<Users>();
   const params = useParams();
-  const [img, setImg] = useState();
-  const [imgUrl, setImgUrl] = useState([]);
-  const [imgUrlTmp, setImgUrlTmp] = useState();
+  const [img, setImg] = useState<File>();
+  const [imgUrl, setImgUrl] = useState<string[]>([]);
+  const [imgUrlTmp, setImgUrlTmp] = useState<string>();
+
+  const headers = {
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  };
   
   useEffect(() => {
     console.log(88);
@@ -101,13 +98,12 @@ const EditProfilePage = () => {
   console.log(data);
   async function callApi(id: string) {
     try {
-      const url = `http://localhost:9000/user/${id}`;
-      const response = await axios.get(url);
-      const users: User[] = response.data;
-      setData(users);
+      const url = `https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
+      const response = await axios.get(url,headers);
+      const users = response.data.data;
       const user = users.data;
       setData(user);
-      console.log();
+      console.log(user);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -139,7 +135,7 @@ const EditProfilePage = () => {
       phone: phoneRef.current?.value,
       birth_day: birth_dayRef.current?.value,
     };
-    const url = `http://localhost:9000/user/${params.id}`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/user/${params.id}`;
     const response = await axios.put(url, body);
     const result = response.data;
     console.log("=== result.message ===");
@@ -147,10 +143,10 @@ const EditProfilePage = () => {
 
     if (result.message == "Successful operation") {
       console.log("Successful operation");
-      const url = `http://localhost:9000/user/${params.id}`;
+      const url = `https://542d-118-172-203-210.ngrok-free.app/user/${params.id}`;
       console.log(url);
-      const response = await axios.get(url);
-      const users: Users[] = response.data;
+      const response = await axios.get(url,headers);
+      const users = response.data.data;
       const user = users.data;
       setData(user);
       console.log(user);
@@ -166,7 +162,7 @@ const EditProfilePage = () => {
       phone: phoneRef.current?.value,
       birth_day: birth_dayRef.current?.value,
     };
-    const url = `http://localhost:9000/admin/${params.id}`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/admin/${params.id}`;
     const response = await axios.put(url, body);
     const result = response.data;
     console.log("=== result.message ===");
@@ -174,11 +170,11 @@ const EditProfilePage = () => {
 
     if (result.message == "Successful operation") {
       console.log("Successful operation");
-      const url = `http://localhost:9000/admin/${params.id}`;
+      const url = `https://542d-118-172-203-210.ngrok-free.app/admin/${params.id}`;
       console.log(url);
-      const response = await axios.get(url);
-      const admins: Admin[] = response.data;
-      const admin = admins.data;
+      const response = await axios.get(url,headers);
+      const admins = response.data.data;
+      const admin = admins;
       setData(admin);
       console.log(admin);
       console.log(admin._id);
@@ -194,12 +190,12 @@ const EditProfilePage = () => {
       ) : params.id != null && type === "1" ? (
         <HeaderAdmin data={params.id} type={type}/>
       ) : (
-        <Header />
+        <Header data={params.id} type={type} />
       )}
 
       <Container sx={{ display: "flex", justifyContent: "center" }}>
         <Box
-          sx={(theme) => ({
+          sx={{
             width: "770px",
             border: "1px solid rgba(100, 100, 100, 0.87)",
             padding: "4rem",
@@ -212,7 +208,7 @@ const EditProfilePage = () => {
                 " 0 0 1em rgba(100, 100, 100, 0.87), 0 0 1em rgba(100, 100, 100, 0.87),  0 0 1em rgba(100, 100, 100, 0.87)",
               transform: "translateY(-2px)",
             },
-          })}
+          }}
         >
           <h1>Edit Profile</h1>
 
@@ -229,10 +225,14 @@ const EditProfilePage = () => {
           />
           <br />
           <form>
-            <TextField
-              type="file"
-              onChange={(e) => setImg(e.target.files[0])}
-            />
+          <TextField
+            type="file"
+            onChange={(e) => {
+              const file = (e.target as HTMLInputElement).files?.[0];
+              console.log(file);
+              return setImg(file);
+            }}
+          ></TextField>
           </form>
           <TextField
             sx={{

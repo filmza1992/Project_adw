@@ -1,42 +1,39 @@
-import { Box, Container, textAlign } from "@mui/system";
+import { Box, Container} from "@mui/system";
 import { useNavigate } from "react-router-dom";
-import { Button, Grid } from "@mui/material";
+import { Button} from "@mui/material";
 import HeaderAdmin from "../../component/headerAdmin";
 import HeaderUser from "../../component/headerUser";
 import Header from "../../component/header";
 import AspectRatio from "@mui/joy/AspectRatio";
-import Avatar from "@mui/joy/Avatar";
 import Card from "@mui/joy/Card";
 import CardContent from "@mui/joy/CardContent";
 import Typography from "@mui/joy/Typography";
-import IconButton from "@mui/joy/IconButton";
-import Link from "@mui/joy/Link";
 import { useParams, useSearchParams } from "react-router-dom";
-import { Users } from "../../model/users";
 import axios from "axios";
-import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import { useEffect, useState } from "react";
-import { Admin } from "../../model/Admin";
-import { Image } from "../../model/Image";
-import { User } from "firebase/auth";
+import { Users } from "../../model/users";
 
 const ListProfilePage = () => {
   const params = useParams();
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
-  const [adminData, setAdminData] = useState<Admin[]>([]);
-  const [userData, setUserData] = useState<User[]>([]);
-  const [ImageData, setImageData] = useState<Image[]>([]);
-  const [data, setData] = useState<any>(null);
+  const [userData, setUserData] = useState<Users[]>([]);
+  const [data, setData] = useState<Users[]>([]);
   const navigate = useNavigate(); // ย้ายไปข้างบน
+
+  const headers = {
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  };
 
   useEffect(() => {
     if (params.id != null) {
-      callApi(params.id, type);
+      callApi(params.id, type!);
     }
   }, [params.id]);
   async function DeleteUser(id: string) {
-    const url = `http://localhost:9000/user/${id}`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
     try {
       await axios.delete(url);
       // รีเฟรชหน้าเว็บ
@@ -51,22 +48,22 @@ const ListProfilePage = () => {
   }
   async function callApi(id: string, type: string) {
     if (type == "1") {
-      const url = `http://localhost:9000/admin/${id}`;
+      const url = `https://542d-118-172-203-210.ngrok-free.app/admin/${id}`;
       try {
-        const response = await axios.get(url);
-        const admin: Admin[] = response.data;
-        const data = admin.data;
-        setAdminData(data);
+        const response = await axios.get(url,headers);
+        const admin = response.data.data;
+        const data = admin;
         setData(data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
-    const url = `http://localhost:9000/user`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/user`;
     try {
-      const response = await axios.get(url);
-      const users: User[] = response.data;
-      const data = users.data;
+      const response = await axios.get(url,headers);
+      const users:Users[] = response.data.data;
+      const data = users;
+      console.log(data);
       setUserData(data);
       setData(data);
     } catch (error) {
@@ -98,7 +95,7 @@ const ListProfilePage = () => {
             >
               <h1 style={{ marginTop: "1.5rem" }}>List User Profile </h1>
             </Box>
-            {userData.map((item, index) => {
+            {userData.map((item , index) => {
               return (
                 <Box
                   sx={{
@@ -113,7 +110,7 @@ const ListProfilePage = () => {
                     variant="outlined"
                     orientation="horizontal"
                     onClick={() =>
-                        navigateToShowProfile(userData[index]?._id)
+                        navigateToShowProfile(item._id)
                       }
                     sx={{
                       width: "100%",

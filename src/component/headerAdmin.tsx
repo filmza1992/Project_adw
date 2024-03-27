@@ -1,7 +1,6 @@
-import { AppBar, Toolbar, IconButton, Typography, Button } from "@mui/material";
+import { AppBar, Toolbar,  Typography, Button } from "@mui/material";
 import { Box } from "@mui/system";
-import MenuIcon from "@mui/icons-material/Menu";
-import Avatar from "@mui/joy/Avatar";
+
 import { useNavigate } from "react-router-dom";
 
 function Header({ data, type }) {

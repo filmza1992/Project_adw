@@ -1,6 +1,7 @@
+
 import { Box, Container } from "@mui/system";
 import { useNavigate } from "react-router-dom";
-import { Button, Grid } from "@mui/material";
+import { Button} from "@mui/material";
 import HeaderAdmin from "../../component/headerAdmin";
 import HeaderUser from "../../component/headerUser";
 import Header from "../../component/header";
@@ -14,70 +15,75 @@ import { useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import { useEffect, useState } from "react";
-import { Admin } from "../../model/Admin";
+
 import { Image } from "../../model/Image";
 import { Vote } from "../../model/Vote";
-import { User } from "firebase/auth";
+
 import { BarChart } from "@mui/x-charts/BarChart";
+import { Users } from "../../model/users";
+
 const StatPage = () => {
   const params = useParams();
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
   const img_id = searchParams.get("img_id");
-  const [adminData, setAdminData] = useState<Admin[]>([]);
-  const [userData, setUserData] = useState<User[]>([]);
-  const [ImageData, setImageData] = useState<Image[]>([]);
+
   const [VoteData, setVoteData] = useState<Vote[]>([]);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<Users>();
   const navigate = useNavigate(); // ย้ายไปข้างบน
+
+  const headers = {
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  };
   useEffect(() => {
     if (params.id != null) {
-      callApi(params.id, type);
+      callApi(params.id, type!);
     }
   }, [params.id]);
 
   async function callApi(id: string, type: string) {
     if (type == "1") {
-      const url = `http://localhost:9000/admin/${id}`;
+      const url = `https://542d-118-172-203-210.ngrok-free.app/admin/${id}`;
       try {
-        const response = await axios.get(url);
-        const admin: Admin[] = response.data;
-        const data = admin.data;
-        setAdminData(data);
+        const response = await axios.get(url,headers);
+        const admin = response.data.data;
+        const data = admin;
         setData(data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     } else {
-      const url = `http://localhost:9000/user/${id}`;
+      const url = `https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
       try {
-        const response = await axios.get(url);
-        const users: User[] = response.data;
-        const data = users.data;
-        setUserData(data);
-        setData(data);
+        const response = await axios.get(url,headers);
+        const users = response.data.data;
+        const data = users;
+        setData(data[0]);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-      const url1 = `http://localhost:9000/image/user/${id}`;
+      const url1 = `https://542d-118-172-203-210.ngrok-free.app/image/user/${id}`;
       try {
-        const response = await axios.get(url1);
-        const imagepost: image[] = response.data;
-        const data = imagepost.data;
-        setImageData(data);
+        const response = await axios.get(url1,headers);
+        const imagepost: Image[] = response.data;
+        const data = imagepost;
+        return data;
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-      const url3 = `http://localhost:9000/vote/${img_id}`;
+      const url3 = `https://542d-118-172-203-210.ngrok-free.app/vote/${img_id}`;
       try {
-        const response = await axios.get(url3);
+        const response = await axios.get(url3,headers);
         const vote: Vote[] = response.data;
-        const data = vote.data;
+        const data = vote;
         setVoteData(data);
         console.log(data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
+      return 0;
     }
   }
 
@@ -88,21 +94,21 @@ const StatPage = () => {
         "/?type=" +
         type +
         "&name=" +
-        data.username +
+        data?.username +
         "&phone=" +
-        data.phone +
+        data?.phone +
         "&birthday=" +
-        data.birth_day
+        data?.birth_day
     ); // ใส่เช็คว่า data ไม่ใช่ null ก่อนที่จะเรียกใช้
   }
   async function DeleteImage(id: string, idvote: string) {
-    const url = `http://localhost:9000/image/${id}`;
+    const url = `https://542d-118-172-203-210.ngrok-free.app/image/${id}`;
     try {
       await axios.delete(url);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-    const url2 = `http://localhost:9000/vote/${idvote}`;
+    const url2 = `https://542d-118-172-203-210.ngrok-free.app/vote/${idvote}`;
     try {
       await axios.delete(url2);
       window.location.reload();
@@ -235,7 +241,7 @@ const StatPage = () => {
                 <Box sx={{ display: "flex" }}>
                   <div style={{ textAlign: "left" }}>
                     <Typography level="title-lg">
-                      {VoteData?.img.user.username}
+                      {VoteData[0]?.img.user.username}
                     </Typography>
                     <Typography level="body-sm">{data?.email}</Typography>
                   </div>
@@ -246,9 +252,9 @@ const StatPage = () => {
                     sx={{ ml: "auto", alignSelf: "flex-start" }}
                   >
                     <Typography level="body-sm" sx={{ marginRight: "0.5rem" }}>
-                      {VoteData?.point}
+                      {VoteData[0]?.point}
                     </Typography>
-                    <FavoriteBorderRoundedIcon color="danger" />
+                    <FavoriteBorderRoundedIcon />
                   </IconButton>
                 </Box>
                 <AspectRatio
@@ -259,7 +265,7 @@ const StatPage = () => {
                     pointerEvents: "none",
                   }}
                 >
-                  <img alt="" src={VoteData?.img.img_url} />
+                  <img alt="" src={VoteData[0]?.img.img_url} />
                 </AspectRatio>
                 <Box sx={{ display: "flex", gap: 1.5, mt: "auto" }}>
                   <Avatar
@@ -270,7 +276,7 @@ const StatPage = () => {
                   <div>
                     <Typography level="body-xs">Designed by</Typography>
                     <Typography level="body-sm">
-                      {VoteData?.img.user.username}
+                      {VoteData[0]?.img.user.username}
                     </Typography>
                   </div>
                 </Box>
@@ -280,7 +286,7 @@ const StatPage = () => {
                       color: "rgba(100, 100, 100, 0.87)",
                       marginRight: "1rem",
                     }}
-                    onClick={() => DeleteImage(VoteData?.img._id, VoteData._id)}
+                    onClick={() => DeleteImage(VoteData[0]?.img.img_id, VoteData[0]._id)}
                   >
                     Delete
                   </Button>
@@ -289,7 +295,7 @@ const StatPage = () => {
                       color: "rgba(100, 100, 100, 0.87)",
                       marginLeft: "1rem",
                     }}
-                    onClick={() => navigateToEditImage(VoteData?.img.img_id)}
+                    onClick={() => navigateToEditImage(VoteData[0]?.img.img_id)}
                   >
                     Edit
                   </Button>

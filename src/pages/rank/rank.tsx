@@ -1,45 +1,45 @@
 import { Box, Container } from "@mui/system";
-import TextField from "@mui/material/TextField";
-import styled from "styled-components";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Button } from "@mui/material";
-import Avatar from "@mui/joy/Avatar";
+
+import {useParams, useSearchParams } from "react-router-dom";
+
 import Table from "@mui/joy/Table";
-import Typography from "@mui/joy/Typography";
-import Link from "@mui/joy/Link";
+
 import Header from "../../component/header";
 import HeaderUser from "../../component/headerUser";
 import HeaderAdmin from "../../component/headerAdmin";
 import { Admin } from "../../model/Admin";
 import { Users } from "../../model/users";
-import { Image } from "../../model/Image";
 import { Vote } from "../../model/Vote";
 import AspectRatio from "@mui/joy/AspectRatio";
 import axios from "axios";
 import { useEffect, useState } from "react";
 const RankPage = () => {
-  const [adminData, setAdminData] = useState<Admin[]>([]);
-  const [ImageData, setImageData] = useState<Image[]>([]);
-  const [VoteData, setVoteData] = useState<Vote[]>([]);
-  const [userData, setUserData] = useState<Users[]>([]);
-  const [Resultdata, setData] = useState<any>(null);
-  const arr = [1, 2, 3, 4, 5];
-  const navigate = useNavigate();
+  const [adminData, setAdminData] = useState<Admin>();
+  const [VoteData, setVoteData] = useState<Vote[]>();
+  const [userData, setUserData] = useState<Users>();
+
   const params = useParams();
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
+  const headers = {
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  };
   useEffect(() => {
     if (params.id == null) {
-      callApiVote(params.id);
+      callApiVote();
     }
   }, [params.id]);
 
-  async function callApiVote(id: string) {
-    const url2 = `http://localhost:9000/vote`;
+  async function callApiVote() {
+    console.log(adminData);
+    console.log(userData);
+    const url2 = `https://542d-118-172-203-210.ngrok-free.app/vote`;
     try {
-      const response = await axios.get(url2);
-      const vote: Vote[] = response.data;
-      const data = vote.data;
+      const response = await axios.get(url2,headers);
+      const vote: Vote[] = response.data.data;
+      const data = vote;
       const seen = new Set();
       const updatedData: Vote[] = [];
       data.forEach((item) => {
@@ -71,36 +71,35 @@ const RankPage = () => {
   useEffect(() => {
     if (params.id != null) {
       callApi(params.id, type);
-      callApiVote(params.id);
+      callApiVote();
     }
   }, [params.id]);
 
   async function callApi(id: string, type: string) {
     if (type == "1") {
-      const url = `http://localhost:9000/admin/${id}`;
+      const url = `https://542d-118-172-203-210.ngrok-free.app/admin/${id}`;
       try {
-        const response = await axios.get(url);
-        const admin: Admin[] = response.data;
-        const data = admin.data;
+        const response = await axios.get(url,headers);
+        const admin: Admin = response.data.data;
+        const data = admin;
         setAdminData(data);
-        setData(data);
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     } else {
-      const url = `http://localhost:9000/user/${id}`;
+      const url = `https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
       try {
-        const response = await axios.get(url);
-        const users: Users[] = response.data;
-        const data = users.data;
+        const response = await axios.get(url,headers);
+        const users: Users = response.data.data;
+        const data = users;
         setUserData(data);
-        setData(data);
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     }
   }
-  console.log(ImageData);
 
   return (
     <>
@@ -128,7 +127,7 @@ const RankPage = () => {
                 <th style={{ textAlign: "center" }}>Point</th>
               </tr>
             </thead>
-            {VoteData.slice(0, 10).map((arr, index) => {
+            {VoteData.slice(0, 10).map((item,index) => {
               return (
                 <tbody>
                   <tr>
@@ -148,7 +147,7 @@ const RankPage = () => {
                       </AspectRatio>
                     </td>
                     <td style={{}}>
-                      <p>{VoteData[index].img.user.username}</p>
+                      <p>{item.img.user.username}</p>
                     </td>
                     <td>
                       <h2>{VoteData[index].point}</h2>

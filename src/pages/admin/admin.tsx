@@ -1,6 +1,5 @@
 import { Box, Container } from "@mui/system";
 import TextField from "@mui/material/TextField";
-import styled from "styled-components";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import HeaderUser from "../../component/headerUser";
 import HeaderAdmin from "../../component/headerAdmin";
@@ -15,11 +14,16 @@ import { Button } from "@mui/material";
 const AdminPage = () => {
   const timesetRef = useRef<HTMLInputElement>();
   const navigate = useNavigate();
-  const [dataAdmin, setDataAdmin] = useState<Admin[]>([]);
+  const [dataAdmin, setDataAdmin] = useState<Admin>();
   const [dataTimeSet, setDataTimeSet] = useState<TimeSet[]>([]);
   const params = useParams();
   const [searchParams] = useSearchParams();
   const type = searchParams.get("type");
+  const headers = {
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  };
 
   useEffect(() => {
     if (params.id != null) {
@@ -29,20 +33,21 @@ const AdminPage = () => {
 
   async function callApi(id: string) {
     try {
-      const url = `http://localhost:9000/admin/${id}`;
-      const response = await axios.get(url);
-      const admins: Admin[] = response.data;
-      const data = admins.data;
+      const url = `https://https://542d-118-172-203-210.ngrok-free.app/admin/${id}`;
+      console.log(dataAdmin);
+      const response = await axios.get(url,headers);
+      const admins= response.data.data;
+      const data = admins[0];
       setDataAdmin(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
 
     try {
-      const url = `http://localhost:9000/timeset`;
-      const response = await axios.get(url);
+      const url = `https://https://542d-118-172-203-210.ngrok-free.app/timeset`;
+      const response = await axios.get(url,headers);
       const timesets: TimeSet[] = response.data;
-      const data = timesets.data;
+      const data = timesets;
       setDataTimeSet(data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -57,7 +62,7 @@ const AdminPage = () => {
     };
 
     try {
-      const url = `http://localhost:9000/timeset/${id}`;
+      const url = `https://https://542d-118-172-203-210.ngrok-free.app/timeset/${id}`;
       const response = await axios.put(url, body);
       const result = response.data;
       console.log(result.message);
