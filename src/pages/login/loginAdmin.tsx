@@ -7,6 +7,7 @@ import Header from "../../component/header";
 import axios from "axios";
 import { Users } from "../../model/users";
 import { useRef, useState } from "react";
+import { endpoint } from "../../constant/endpoint";
 const LoginAdminPage = () => {
   const emailRef = useRef<HTMLInputElement>();
   const passwordRef = useRef<HTMLInputElement>();
@@ -16,7 +17,7 @@ const LoginAdminPage = () => {
       email: emailRef.current?.value,
       password: passwordRef.current?.value,
     };
-    const url = `https://542d-118-172-203-210.ngrok-free.app/user/login`;
+    const url = endpoint +`/user/login`;
     const response = await axios.post(url, body);
     const result = response.data;
 
@@ -27,7 +28,7 @@ const LoginAdminPage = () => {
     };
     if (result.message == "Successfuly_Login_Admin") {
       console.log("Successfuly_Login");
-      const url = "https://542d-118-172-203-210.ngrok-free.app/admin/email/"+emailRef.current?.value;
+      const url = endpoint +"/admin/email/"+emailRef.current?.value;
       const response = await axios.get(url,headers);
       const users: Users = response.data.data;
       const user = users;

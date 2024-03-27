@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 
 import { Vote } from "../../model/Vote";
 import { Users } from "../../model/users";
+import { endpoint } from "../../constant/endpoint";
 
 const ProfilePage = () => {
   const params = useParams();
@@ -43,7 +44,7 @@ const ProfilePage = () => {
   async function callApi(id: string, type: string) {
     if (type == "1") {
       
-      const url = `https://542d-118-172-203-210.ngrok-free.app/admin/${id}`;
+      const url = endpoint +`/admin/${id}`;
       try {
         const response = await axios.get(url,headers);
         const userData = response.data.data;
@@ -54,7 +55,7 @@ const ProfilePage = () => {
       }
     } else {
       console.log(id);
-      const url = `https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
+      const url = endpoint +`/user/${id}`;
       try {
         const response = await axios.get(url,headers);
         const userData = response.data.data;
@@ -64,7 +65,7 @@ const ProfilePage = () => {
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-      const url1 = `https://542d-118-172-203-210.ngrok-free.app/image/user/${id}`;
+      const url1 = endpoint +`/image/user/${id}`;
       try {
         const response = await axios.get(url1,headers);
         const data = response.data.data;
@@ -73,7 +74,7 @@ const ProfilePage = () => {
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-      const url2 = `https://542d-118-172-203-210.ngrok-free.app/vote/user/${id}`;
+      const url2 = endpoint +`/vote/user/${id}`;
       try {
         const response = await axios.get(url2,headers);
         const vote: Vote[] = response.data.data;
@@ -101,13 +102,13 @@ const ProfilePage = () => {
     ); // ใส่เช็คว่า data ไม่ใช่ null ก่อนที่จะเรียกใช้
   }
   async function DeleteImage(id: string, idvote: string) {
-    const url = `https://542d-118-172-203-210.ngrok-free.app/image/${id}`;
+    const url = endpoint +`/image/${id}`;
     try {
       await axios.delete(url);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-    const url2 = `https://542d-118-172-203-210.ngrok-free.app/vote/${idvote}`;
+    const url2 = endpoint +`/vote/${idvote}`;
     try {
       await axios.delete(url2);
       window.location.reload();

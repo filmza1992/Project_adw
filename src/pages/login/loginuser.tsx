@@ -7,6 +7,7 @@ import Header from "../../component/header";
 import axios from "axios";
 import { Users } from "../../model/users";
 import { useRef, useState } from "react";
+import { endpoint } from "../../constant/endpoint";
 const LoginUserPage = () => {
   const emailRef = useRef<HTMLInputElement>();
   const passwordRef = useRef<HTMLInputElement>();
@@ -16,13 +17,13 @@ const LoginUserPage = () => {
       email: emailRef.current?.value,
       password: passwordRef.current?.value,
     };
-    const url = `https://542d-118-172-203-210.ngrok-free.app/user/login`;
+    const url = endpoint +`/user/login`;
     const response = await axios.post(url, body);
     const result = response.data;
 
     if (result.message == "Successfuly_Login") {
       console.log("Successfuly_Login");
-      const url = "https://542d-118-172-203-210.ngrok-free.app/user/email/"+emailRef.current?.value;
+      const url = endpoint +"/user/email/"+emailRef.current?.value;
       const response = await axios.get(url,
           {
             headers: {
@@ -87,6 +88,7 @@ const LoginUserPage = () => {
             inputRef={passwordRef}
             label="Password"
             variant="outlined"
+            type="password"
           />
           <br />
 

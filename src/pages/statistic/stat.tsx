@@ -21,6 +21,7 @@ import { Vote } from "../../model/Vote";
 
 import { BarChart } from "@mui/x-charts/BarChart";
 import { Users } from "../../model/users";
+import { endpoint } from "../../constant/endpoint";
 
 const StatPage = () => {
   const params = useParams();
@@ -45,7 +46,7 @@ const StatPage = () => {
 
   async function callApi(id: string, type: string) {
     if (type == "1") {
-      const url = `https://542d-118-172-203-210.ngrok-free.app/admin/${id}`;
+      const url = endpoint +`/admin/${id}`;
       try {
         const response = await axios.get(url,headers);
         const admin = response.data.data;
@@ -55,31 +56,32 @@ const StatPage = () => {
         console.error("Error fetching data:", error);
       }
     } else {
-      const url = `https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
+      const url = endpoint +`/user/${id}`;
       try {
         const response = await axios.get(url,headers);
         const users = response.data.data;
         const data = users;
-        setData(data[0]);
+        setData(data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-      const url1 = `https://542d-118-172-203-210.ngrok-free.app/image/user/${id}`;
+      const url1 = endpoint +`/image/user/${id}`;
       try {
         const response = await axios.get(url1,headers);
-        const imagepost: Image[] = response.data;
+        const imagepost: Image[] = response.data.data;
         const data = imagepost;
-        return data;
+        console.log(data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-      const url3 = `https://542d-118-172-203-210.ngrok-free.app/vote/${img_id}`;
+      const url3 = endpoint +`/vote/image/${img_id}`;
       try {
         const response = await axios.get(url3,headers);
-        const vote: Vote[] = response.data;
+        console.log(response);
+        const vote: Vote[] = response.data.data;
         const data = vote;
         setVoteData(data);
-        console.log(data);
+        console.log(data[0]);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -102,13 +104,13 @@ const StatPage = () => {
     ); // ใส่เช็คว่า data ไม่ใช่ null ก่อนที่จะเรียกใช้
   }
   async function DeleteImage(id: string, idvote: string) {
-    const url = `https://542d-118-172-203-210.ngrok-free.app/image/${id}`;
+    const url = endpoint +`/image/${id}`;
     try {
       await axios.delete(url);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-    const url2 = `https://542d-118-172-203-210.ngrok-free.app/vote/${idvote}`;
+    const url2 = endpoint +`/vote/${idvote}`;
     try {
       await axios.delete(url2);
       window.location.reload();
@@ -116,8 +118,8 @@ const StatPage = () => {
       console.error("Error fetching data:", error);
     }
   }
-  function navigateToEditImage(id: string) {
-    navigate("/changeImg/" + data?._id + "/?type=" + type + "&img_id=" + id);
+  function navigateToEditImage() {
+    navigate("/changeImg/" + data?._id + "/?type=" + type + "&img_id=" + img_id);
   }
   function navigateToImgUploade() {
     if (VoteData.length >= 5) {
@@ -209,7 +211,7 @@ const StatPage = () => {
               ) : null}
             </Box>
           </Box>
-          <Box sx={{ minHeight: 350, margin: "1rem" }}>
+          <Box sx={{ minHeight: 350, margin: "1rem" ,flexDirection:"row",display:'flex',justifyContent:"space-around"}}>
             <Card
               variant="outlined"
               sx={(theme) => ({
@@ -295,15 +297,14 @@ const StatPage = () => {
                       color: "rgba(100, 100, 100, 0.87)",
                       marginLeft: "1rem",
                     }}
-                    onClick={() => navigateToEditImage(VoteData[0]?.img.img_id)}
+                    onClick={() => navigateToEditImage()}
                   >
                     Edit
                   </Button>
                 </Box>
               </Box>
             </Card>
-          </Box>
-          <div>
+            <div>
             <BarChart
               series={[
                 { data: [35] },
@@ -317,6 +318,8 @@ const StatPage = () => {
               margin={{ top: 10, bottom: 30, left: 40, right: 10 }}
             />
           </div>
+          </Box>
+          
         </Box>
       </Container>
     </>

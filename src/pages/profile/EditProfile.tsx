@@ -15,6 +15,7 @@ import { getDownloadURL, listAll, ref, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
 import { imgDB } from "../image/config";
 import HeaderAdmin from "../../component/headerAdmin";
+import { endpoint } from "../../constant/endpoint";
 // import { initializeApp } from "firebase/app";
 // import { getStorage } from "firebase/storage";
 
@@ -98,7 +99,7 @@ const EditProfilePage = () => {
   console.log(data);
   async function callApi(id: string) {
     try {
-      const url = `https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
+      const url = endpoint +`/user/${id}`;
       const response = await axios.get(url,headers);
       const users = response.data.data;
       const user = users.data;
@@ -135,7 +136,7 @@ const EditProfilePage = () => {
       phone: phoneRef.current?.value,
       birth_day: birth_dayRef.current?.value,
     };
-    const url = `https://542d-118-172-203-210.ngrok-free.app/user/${params.id}`;
+    const url = endpoint +`/user/${params.id}`;
     const response = await axios.put(url, body);
     const result = response.data;
     console.log("=== result.message ===");
@@ -143,7 +144,7 @@ const EditProfilePage = () => {
 
     if (result.message == "Successful operation") {
       console.log("Successful operation");
-      const url = `https://542d-118-172-203-210.ngrok-free.app/user/${params.id}`;
+      const url = endpoint +`/user/${params.id}`;
       console.log(url);
       const response = await axios.get(url,headers);
       const users = response.data.data;
@@ -162,7 +163,7 @@ const EditProfilePage = () => {
       phone: phoneRef.current?.value,
       birth_day: birth_dayRef.current?.value,
     };
-    const url = `https://542d-118-172-203-210.ngrok-free.app/admin/${params.id}`;
+    const url = endpoint +`/admin/${params.id}`;
     const response = await axios.put(url, body);
     const result = response.data;
     console.log("=== result.message ===");
@@ -170,7 +171,7 @@ const EditProfilePage = () => {
 
     if (result.message == "Successful operation") {
       console.log("Successful operation");
-      const url = `https://542d-118-172-203-210.ngrok-free.app/admin/${params.id}`;
+      const url = endpoint +`/admin/${params.id}`;
       console.log(url);
       const response = await axios.get(url,headers);
       const admins = response.data.data;

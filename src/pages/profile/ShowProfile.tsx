@@ -17,6 +17,7 @@ import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded
 import { useEffect, useState } from "react";
 import { Image } from "../../model/Image";
 import { Users } from "../../model/users";
+import { endpoint } from "../../constant/endpoint";
 
 const ShowProfilePage = () => {
   const params = useParams();
@@ -41,7 +42,7 @@ const ShowProfilePage = () => {
 
   async function callApi(id: string) {
     
-      const url = `https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
+      const url = endpoint +`/user/${id}`;
       try {
         const response = await axios.get(url,headers);
         const users = response.data.data;
@@ -50,7 +51,7 @@ const ShowProfilePage = () => {
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-      const url1 = `https://542d-118-172-203-210.ngrok-free.app/image/user/${id}`;
+      const url1 = endpoint +`/image/user/${id}`;
       try {
         const response = await axios.get(url1,headers);
         const imagepost: Image[] = response.data.data;

@@ -15,6 +15,7 @@ import axios from "axios";
 import { Users } from "../../model/users";
 import { Image } from "../../model/Image";
 import Alert from "@mui/joy/Alert";
+import { endpoint } from "../../constant/endpoint";
 function ImageUpLoadPage() {
   const [img, setImg] = useState<File>();
   const [imgUrl, setImgUrl] = useState<string[]>([]);
@@ -39,7 +40,7 @@ function ImageUpLoadPage() {
   }, [params.id]);
 
   async function callApi(id: string) {
-    const url = `https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
+    const url = endpoint +`/user/${id}`;
     console.log(imgUrl);
     console.log(ImageData);
     try {
@@ -115,7 +116,7 @@ function ImageUpLoadPage() {
         photoURL: userData.img_url,
       },
     };
-    const url = `https://542d-118-172-203-210.ngrok-free.app/image`;
+    const url = endpoint +`/image`;
     try {
       const response = await axios.post(url, body);
       const result = response.data;
@@ -133,7 +134,7 @@ function ImageUpLoadPage() {
   }
 
   async function callmage() {
-    const urlimage = `https://542d-118-172-203-210.ngrok-free.app/user/image`;
+    const urlimage = endpoint +`/user/image`;
     try {
       const response = await axios.get(urlimage);
       const image: Image[] = response.data;
@@ -162,7 +163,7 @@ function ImageUpLoadPage() {
       },
       create_at: new Date(),
     };
-    const url = `https://542d-118-172-203-210.ngrok-free.app/user/vote`;
+    const url = endpoint +`/vote`;
     const response = await axios.post(url, body);
     const result = response.data;
     console.log(result.message);

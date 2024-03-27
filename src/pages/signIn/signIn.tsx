@@ -10,6 +10,7 @@ import { getDownloadURL, listAll, ref, uploadBytes } from "firebase/storage";
 import { useEffect } from "react";
 import { v4 } from "uuid";
 import { imgDB } from "../image/config";
+import { endpoint } from "../../constant/endpoint";
 const SignInPage = () => {
   const [img, setImg] = useState<File>();
   const [imgUrl, setImgUrl] = useState([]);
@@ -111,14 +112,14 @@ const SignInPage = () => {
       password: password1Ref.current?.value,
       birth_day: birth_dayRef.current?.value,
     };
-    const url = `https://542d-118-172-203-210.ngrok-free.app/user`;
+    const url = endpoint +`/user`;
     const response = await axios.post(url, body);
     const result = response.data;
     console.log(result.message);
     if (result.message == "created user successfully") {
       console.log("created user successfully");
       const url =
-        "https://542d-118-172-203-210.ngrok-free.app/user/email/" + emailRef.current?.value;
+      endpoint + "/user/email/" + emailRef.current?.value;
       console.log(url);
       const response = await axios.get(url,headers);
       const users: Users = response.data.data;

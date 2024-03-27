@@ -10,6 +10,7 @@ import { Admin } from "../../model/Admin";
 import { TimeSet } from "../../model/TimeSet";
 import axios from "axios";
 import { Button } from "@mui/material";
+import { endpoint } from "../../constant/endpoint";
 
 const AdminPage = () => {
   const timesetRef = useRef<HTMLInputElement>();
@@ -33,7 +34,7 @@ const AdminPage = () => {
 
   async function callApi(id: string) {
     try {
-      const url = `https://https://542d-118-172-203-210.ngrok-free.app/admin/${id}`;
+      const url = endpoint +`/admin/${id}`;
       console.log(dataAdmin);
       const response = await axios.get(url,headers);
       const admins= response.data.data;
@@ -44,7 +45,7 @@ const AdminPage = () => {
     }
 
     try {
-      const url = `https://https://542d-118-172-203-210.ngrok-free.app/timeset`;
+      const url = endpoint +`/timeset`;
       const response = await axios.get(url,headers);
       const timesets: TimeSet[] = response.data;
       const data = timesets;
@@ -62,7 +63,7 @@ const AdminPage = () => {
     };
 
     try {
-      const url = `https://https://542d-118-172-203-210.ngrok-free.app/timeset/${id}`;
+      const url = endpoint +`/timeset/${id}`;
       const response = await axios.put(url, body);
       const result = response.data;
       console.log(result.message);

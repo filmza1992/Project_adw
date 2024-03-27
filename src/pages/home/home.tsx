@@ -19,6 +19,7 @@ import { useTheme } from "@mui/material/styles";
 import AspectRatio from "@mui/joy/AspectRatio";
 import React from "react";
 import { Image } from "../../model/Image";
+import { endpoint } from "../../constant/endpoint";
 function HomePage() {
   const params = useParams();
 
@@ -60,7 +61,7 @@ function HomePage() {
   }, [TimeSetData, params.id]);
 
   async function callApiVote() {
-    const url2 = `https://542d-118-172-203-210.ngrok-free.app/vote`;
+    const url2 = endpoint +`/vote`;
     try {
       const response = await axios.get(url2,headers);
       const vote: Vote[] = response.data.data;
@@ -71,7 +72,7 @@ function HomePage() {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-    const url3 = `https://542d-118-172-203-210.ngrok-free.app/image`;
+    const url3 = endpoint +`/image`;
     try {
       const response = await axios.get(url3,headers);
       const image: Image[] = response.data.data;
@@ -98,7 +99,7 @@ function HomePage() {
     }
   }, [TimeSetData, params.id]);
   async function callApiTimeSet() {
-    const url2 = `https://542d-118-172-203-210.ngrok-free.app/timeset`;
+    const url2 = endpoint +`/timeset`;
     try {
       const response = await axios.get(url2,headers);
       const timeset: TimeSet[] = response.data.data;
@@ -154,7 +155,7 @@ function HomePage() {
     console.log(
       "=========== callApiVoteForplayer1(playerscall[0]?._id); =======" + id
     );
-    const url = `https://542d-118-172-203-210.ngrok-free.app/vote/image/${id}`;
+    const url = endpoint +`/vote/image/${id}`;
     try {
       const response = await axios.get(url,headers);
       const vote: Vote[] = response.data.data;
@@ -169,7 +170,7 @@ function HomePage() {
     console.log(
       "=========== callApiVoteForplayer1(playerscall[0]?._id); =======" + id
     );
-    const url = `https://542d-118-172-203-210.ngrok-free.app/vote/image/${id}`;
+    const url = endpoint +`/vote/image/${id}`;
     try {
       const response = await axios.get(url,headers);
       const vote: Vote[] = response.data.data;
@@ -296,14 +297,14 @@ function HomePage() {
     }
     try {
       const responseWinner = await axios.get(
-        `https://542d-118-172-203-210.ngrok-free.app/vote/${winnerId}`,headers
+        endpoint +`/vote/${winnerId}`,headers
       );
       const winnerData: Vote = responseWinner.data.data;
 
       await upPointWin(winnerData, pointWinner);
 
       const responseLoser = await axios.get(
-        `https://542d-118-172-203-210.ngrok-free.app/vote/${loserId}`,headers
+        endpoint +`/vote/${loserId}`,headers
       );
       const loserData: Vote = responseLoser.data.data;
 
@@ -326,7 +327,7 @@ function HomePage() {
       },
       create_at: new Date(),
     };
-    const urlwinner = `https://542d-118-172-203-210.ngrok-free.app/vote`;
+    const urlwinner = endpoint +`/vote`;
     const responsewinner = await axios.post(urlwinner, bodywinner);
     const resultwinner = responsewinner.data;
     console.log(resultwinner.message);
@@ -351,7 +352,7 @@ function HomePage() {
       },
       create_at: new Date(),
     };
-    const urlloser = `https://542d-118-172-203-210.ngrok-free.app/vote`;
+    const urlloser = endpoint +`/vote`;
     const responseloser = await axios.post(urlloser, bodyloser);
     const resultloser = responseloser.data;
     console.log(resultloser.message);

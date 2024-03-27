@@ -13,9 +13,10 @@ import { Vote } from "../../model/Vote";
 import AspectRatio from "@mui/joy/AspectRatio";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { endpoint } from "../../constant/endpoint";
 const RankPage = () => {
   const [adminData, setAdminData] = useState<Admin>();
-  const [VoteData, setVoteData] = useState<Vote[]>();
+  const [VoteData, setVoteData] = useState<Vote[]>([]);
   const [userData, setUserData] = useState<Users>();
 
   const params = useParams();
@@ -35,7 +36,7 @@ const RankPage = () => {
   async function callApiVote() {
     console.log(adminData);
     console.log(userData);
-    const url2 = `https://542d-118-172-203-210.ngrok-free.app/vote`;
+    const url2 = endpoint +`/vote`;
     try {
       const response = await axios.get(url2,headers);
       const vote: Vote[] = response.data.data;
@@ -77,7 +78,7 @@ const RankPage = () => {
 
   async function callApi(id: string, type: string) {
     if (type == "1") {
-      const url = `https://542d-118-172-203-210.ngrok-free.app/admin/${id}`;
+      const url = endpoint +`/admin/${id}`;
       try {
         const response = await axios.get(url,headers);
         const admin: Admin = response.data.data;
@@ -88,7 +89,7 @@ const RankPage = () => {
         console.error("Error fetching data:", error);
       }
     } else {
-      const url = `https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
+      const url = endpoint +`/user/${id}`;
       try {
         const response = await axios.get(url,headers);
         const users: Users = response.data.data;

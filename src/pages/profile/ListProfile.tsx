@@ -12,6 +12,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Users } from "../../model/users";
+import { endpoint } from "../../constant/endpoint";
 
 const ListProfilePage = () => {
   const params = useParams();
@@ -48,7 +49,7 @@ const ListProfilePage = () => {
   }
   async function callApi(id: string, type: string) {
     if (type == "1") {
-      const url = `https://542d-118-172-203-210.ngrok-free.app/admin/${id}`;
+      const url = endpoint +`/admin/${id}`;
       try {
         const response = await axios.get(url,headers);
         const admin = response.data.data;
@@ -58,7 +59,7 @@ const ListProfilePage = () => {
         console.error("Error fetching data:", error);
       }
     }
-    const url = `https://542d-118-172-203-210.ngrok-free.app/user`;
+    const url = endpoint +`/user`;
     try {
       const response = await axios.get(url,headers);
       const users:Users[] = response.data.data;

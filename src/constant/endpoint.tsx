@@ -1,0 +1,1 @@
+export const endpoint = "https://542d-118-172-203-210.ngrok-free.app";

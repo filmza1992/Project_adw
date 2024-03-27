@@ -14,6 +14,7 @@ import { v4 } from "uuid";
 import { imgDB } from "../image/config";
 import { Users } from "../../model/users";
 import { Image } from "../../model/Image";
+import { endpoint } from "../../constant/endpoint";
 const ChangeImgPage = () => {
   const [img, setImg] = useState<File>();
 
@@ -45,7 +46,7 @@ const ChangeImgPage = () => {
   }, [params.id]);
 
   async function callApi(id: string) {
-    const url = `http://https://542d-118-172-203-210.ngrok-free.app/user/${id}`;
+    const url = endpoint +`/user/${id}`;
     try {
       const response = await axios.get(url, headers);
       const users = response.data.data;
@@ -56,7 +57,7 @@ const ChangeImgPage = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-    const urlvote = `http://https://542d-118-172-203-210.ngrok-free.app/vote/image/${img_id}`;
+    const urlvote = endpoint +`/vote/image/${img_id}`;
     try {
       const response = await axios.get(urlvote, headers);
       const vote: Vote[] = response.data;
@@ -90,7 +91,7 @@ const ChangeImgPage = () => {
         photoURL: userData[0].img_url,
       },
     };
-    const url = `https://542d-118-172-203-210.ngrok-free.app/image/${img_id}`;
+    const url = endpoint +`/image/${img_id}`;
     try {
       const response = await axios.put(url, body);
       const result = response.data;
@@ -108,7 +109,7 @@ const ChangeImgPage = () => {
   }
 
   async function callmage() {
-    const urlimage = `https://542d-118-172-203-210.ngrok-free.app/image/${img_id}`;
+    const urlimage = endpoint +`/image/${img_id}`;
     try {
       const response = await axios.get(urlimage, headers);
       const image: Image[] = response.data.data;
@@ -137,7 +138,7 @@ const ChangeImgPage = () => {
       create_at: new Date(),
     };
 
-    const url = `https://542d-118-172-203-210.ngrok-free.app/vote/${VoteData[0]._id}`;
+    const url = endpoint +`/vote/${VoteData[0]._id}`;
     const response = await axios.put(url, body);
     const result = response.data;
     console.log(result.message);
