@@ -2,7 +2,7 @@ export interface Vote {
     _id:       string;
     point:     number;
     img:       Img;
-    create_at: Date;
+    create_at: number;
 }
 
 export interface Img {

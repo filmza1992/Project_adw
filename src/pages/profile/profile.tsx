@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import { Vote } from "../../model/Vote";
 import { Users } from "../../model/users";
 import { endpoint } from "../../constant/endpoint";
+import { Image } from "../../model/Image";
 
 const ProfilePage = () => {
   const params = useParams();
@@ -27,6 +28,7 @@ const ProfilePage = () => {
   const type = searchParams.get("type");
 
   const [VoteData, setVoteData] = useState<Vote[]>([]);
+  const [image , setImage] = useState<Image[]>([]);
   const [data, setData] = useState<Users>();
   const navigate = useNavigate(); // ย้ายไปข้างบน
 
@@ -42,6 +44,7 @@ const ProfilePage = () => {
   }, [params.id]);
 
   async function callApi(id: string, type: string) {
+    let img : Image[];
     if (type == "1") {
       
       const url = endpoint +`/admin/${id}`;
@@ -69,15 +72,31 @@ const ProfilePage = () => {
       try {
         const response = await axios.get(url1,headers);
         const data = response.data.data;
-        console.log(data);
-     
+        setImage(data);
+        console.log(image);
+        img = data;
+        console.log(img);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
       const url2 = endpoint +`/vote/user/${id}`;
       try {
         const response = await axios.get(url2,headers);
-        const vote: Vote[] = response.data.data;
+        const voteData: Vote[] = response.data.data;
+        const voteSort = voteData.slice().sort((a,b)=>b.create_at - a.create_at);
+        console.log(voteSort);
+        const vote: Vote[] = [];
+        for(const i of img){
+          console.log(i._id);
+          for(const voteS of voteSort){
+            if(i._id == voteS.img.img_id){
+              vote.push(voteS);
+              console.log(voteS);
+              break;
+            }
+          }
+        }
+        console.log(vote);
         const data = vote;
         setVoteData(data);
         console.log(data);
