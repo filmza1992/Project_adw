@@ -124,7 +124,7 @@ function ImageUpLoadPage() {
       if (result.message === "created Image successfully") {
         console.log("created Image successfully");
         // เมื่อ upPost เสร็จสิ้นเรียบร้อย ให้เรียกใช้ callmage
-        callmage();
+        callmage(params.id);
       } else {
         console.log("Created Image not successfully");
       }
@@ -133,11 +133,12 @@ function ImageUpLoadPage() {
     }
   }
 
-  async function callmage() {
-    const urlimage = endpoint +`/user/image`;
+  async function callmage(id:string) {
+    const urlimage = endpoint +`/image/user/${id}`;
     try {
-      const response = await axios.get(urlimage);
-      const image: Image[] = response.data;
+      const response = await axios.get(urlimage,headers);
+      console.log(response);
+      const image: Image[] = response.data.data;
       const data = image;
       setImageData(data);
       console.log(data[data.length - 1]._id);

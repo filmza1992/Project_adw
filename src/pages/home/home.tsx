@@ -65,6 +65,7 @@ function HomePage() {
     try {
       const response = await axios.get(url2,headers);
       const vote: Vote[] = response.data.data;
+      console.log(vote);
       const data = vote;
       setVoteData(data);
       console.log(VoteData);
@@ -89,7 +90,7 @@ function HomePage() {
     }
   }, [params.id]);
   useEffect(() => {
-    if (TimeSetData.length > 0 && params.id != null) {
+    if (params.id != null) {
       const loadDataAsync = async () => {
         await delay(TimeSetData[0]?.time_set * 1000);
         setIsLoadingData(false);
@@ -171,8 +172,10 @@ function HomePage() {
       "=========== callApiVoteForplayer1(playerscall[0]?._id); =======" + id
     );
     const url = endpoint +`/vote/image/${id}`;
+    console.log(url);
     try {
       const response = await axios.get(url,headers);
+      console.log(response);
       const vote: Vote[] = response.data.data;
       const data = vote;
       setVotep2Data(data);
@@ -198,6 +201,7 @@ function HomePage() {
 
     // ตั้งค่าใหม่ให้กับตัวแปร players
     setPlayers(allPlayersData);
+    console.log(players);
     sets1point(lastItem1?.point);
     sets2point(lastItem2?.point);
   }, [lastItem1, lastItem2]);
